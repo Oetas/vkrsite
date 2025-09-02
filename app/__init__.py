@@ -1,7 +1,6 @@
 import os
 from flask import Flask
 from .extensions import db, migrate, login_manager
-from .main import main_bp
 
 def create_app():
     app = Flask(__name__, template_folder="../templates", static_folder="../static")
@@ -11,12 +10,13 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
-    login_manager.login_view = "main.login"  # позже добавим страницу логина
+    login_manager.login_view = "login"  # без main, просто login
 
-    # blueprints
-    app.register_blueprint(main_bp)
+    # роуты прямо тут
+    @app.route("/")
+    def index():
+        return "Привет! Это главная страница."
 
-    # simple health route (проверка)
     @app.get("/health")
     def health():
         return {"status": "ok"}
