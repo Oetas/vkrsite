@@ -12,6 +12,9 @@ def create_app():
     login_manager.init_app(app)
     login_manager.login_view = "login"  # без main, просто login
 
+    # импорт моделей (чтобы Alembic их видел)
+    from app import models
+
     # роуты прямо тут
     @app.route("/")
     def index():
@@ -22,3 +25,4 @@ def create_app():
         return {"status": "ok"}
 
     return app
+
