@@ -152,3 +152,28 @@ class File(db.Model):
     sha256 = db.Column(db.String(64), index=True)
     visibility = db.Column(db.Enum("private","course","public", name="file_visibility"), nullable=False, default="private")
     created_at = db.Column(db.DateTime(timezone=True), default=datetime.utcnow)
+
+# ---------- Reports ----------
+class Report(db.Model):
+    __tablename__ = "reports"
+    id = db.Column(db.BigInteger, primary_key=True)
+    user_id = db.Column(db.BigInteger, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    course_id = db.Column(db.BigInteger, db.ForeignKey("courses.id", ondelete="SET NULL"))
+    type = db.Column(db.Enum("docx","xlsx","pdf", name="report_type"), nullable=False, default="docx")
+    status = db.Column(db.Enum("queued","generating","ready","failed", name="report_status"), nullable=False, default="queued")
+    file_id = db.Column(db.BigInteger, db.ForeignKey("files.id", ondelete="SET NULL"))
+    created_at = db.Column(db.DateTime(timezone=True), default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)
+
+# ---------- News ----------
+class News(db.Model):
+    __tablename__ = "news"
+    id = db.Column(db.BigInteger, primary_key=True)
+    title = db.Column(db.String(255), nullable=False)
+    slug = db.Column(db.String(255), unique=True, nullable=False, index=True)
+    body = db.Column(db.Text)
+    is_published = db.Column(db.Boolean, default=False, nullable=False)
+    published_at = db.Column(db.DateTime(timezone=True))
+    author_user_id = db.Column(db.BigInteger, db.ForeignKey("users.id", ondelete="SET NULL"))
+    created_at = db.Column(db.DateTime(timezone=True), default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)
