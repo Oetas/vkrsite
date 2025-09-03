@@ -51,3 +51,53 @@ class Profile(db.Model):
 
     user = db.relationship("User", back_populates="profile")
     avatar_file = db.relationship("File", foreign_keys=[avatar_file_id])
+
+# ---------- Courses / Lessons / Materials ----------
+class Course(db.Model):
+    __tablename__ = "courses"
+    id = db.Column(db.BigInteger, primary_key=True)
+    title = db.Column(db.String(255), nullable=False)
+    slug = db.Column(db.String(255), unique=True, nullable=False, index=True)
+    description = db.Column(db.Text)
+    level = db.Column(db.Enum("beginner","intermediate","advanced", name="course_level"), nullable=False, default="beginner")
+    is_published = db.Column(db.Boolean, default=False, nullable=False)
+    start_date = db.Column(db.Date)
+    end_date = db.Column(db.Date)
+    created_by = db.Column(db.BigInteger, db.ForeignKey("users.id", ondelete="SET NULL"))
+    created_at = db.Column(db.DateTime(timezone=True), default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    author = db.relationship("User", back_populates="courses_created")
+    lessons = db.relationship("Lesson", back_populates="course", cascade="all, delete-orphan")
+
+class Lesson(db.Model):
+    __tablename__ = "lessons"
+    id = db.Column(db.BigInteger, primary_key=True)
+    course_id = db.Column(db.BigInteger, db.ForeignKey("courses.id", ondelete="CASCADE"), nullable=False, index=True)
+    title = db.Column(db.String(255), nullable=False)
+    order_index = db.Column(db.Integer, nullable=False, default=1)
+    content = db.Column(db.Text)
+    video_url = db.Column(db.String(500))
+    is_published = db.Column(db.Boolean, default=False, nullable=False)
+    created_at = db.Column(db.DateTime(timezone=True), default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    course = db.relationship("Course", back_populates="lessons")
+    materials = db.relationship("Material", back_populates="lesson", cascade="all, delete-orphan")
+
+    __table_args__ = (UniqueConstraint("course_id", "order_index", name="uq_lesson_order"),)
+
+class Material(db.Model):
+    __tablename__ = "materials"
+    id = db.Column(db.BigInteger, primary_key=True)
+    lesson_id = db.Column(db.BigInteger, db.ForeignKey("lessons.id", ondelete="CASCADE"), nullable=False)
+    type = db.Column(db.Enum("pdf","docx","xlsx","notebook","dataset","image","link","other", name="material_type"), nullable=False, default="other")
+    title = db.Column(db.String(255))
+    file_id = db.Column(db.BigInteger, db.ForeignKey("files.id", ondelete="SET NULL"))
+    url = db.Column(db.String(1000))
+    is_required = db.Column(db.Boolean, default=False, nullable=False)
+    created_at = db.Column(db.DateTime(timezone=True), default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    lesson = db.relationship("Lesson", back_populates="materials")
+    file = db.relationship("File")
