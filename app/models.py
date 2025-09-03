@@ -101,3 +101,28 @@ class Material(db.Model):
 
     lesson = db.relationship("Lesson", back_populates="materials")
     file = db.relationship("File")
+
+# ---------- Enrollments / Progress ----------
+class Enrollment(db.Model):
+    __tablename__ = "enrollments"
+    id = db.Column(db.BigInteger, primary_key=True)
+    user_id = db.Column(db.BigInteger, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    course_id = db.Column(db.BigInteger, db.ForeignKey("courses.id", ondelete="CASCADE"), nullable=False, index=True)
+    status = db.Column(db.Enum("active","completed","dropped", name="enrollment_status"), nullable=False, default="active")
+    enrolled_at = db.Column(db.DateTime(timezone=True), default=datetime.utcnow)
+
+    __table_args__ = (UniqueConstraint("user_id", "course_id", name="uq_enrollment_user_course"),)
+
+class Progress(db.Model):
+    __tablename__ = "progress"
+    id = db.Column(db.BigInteger, primary_key=True)
+    user_id = db.Column(db.BigInteger, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    lesson_id = db.Column(db.BigInteger, db.ForeignKey("lessons.id", ondelete="CASCADE"), nullable=False, index=True)
+    status = db.Column(db.Enum("not_started","in_progress","completed", name="lesson_progress"), nullable=False, default="not_started")
+    score = db.Column(db.Numeric(5,2))
+    completed_at = db.Column(db.DateTime(timezone=True))
+    last_viewed_at = db.Column(db.DateTime(timezone=True))
+    created_at = db.Column(db.DateTime(timezone=True), default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    __table_args__ = (UniqueConstraint("user_id", "lesson_id", name="uq_progress_user_lesson"),)
