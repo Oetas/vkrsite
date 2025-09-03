@@ -126,3 +126,29 @@ class Progress(db.Model):
     updated_at = db.Column(db.DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)
 
     __table_args__ = (UniqueConstraint("user_id", "lesson_id", name="uq_progress_user_lesson"),)
+
+# ---------- Feedback ----------
+class Feedback(db.Model):
+    __tablename__ = "feedback"
+    id = db.Column(db.BigInteger, primary_key=True)
+    user_id = db.Column(db.BigInteger, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    target_type = db.Column(db.Enum("course","lesson", name="feedback_target"), nullable=False)
+    course_id = db.Column(db.BigInteger, db.ForeignKey("courses.id", ondelete="CASCADE"))
+    lesson_id = db.Column(db.BigInteger, db.ForeignKey("lessons.id", ondelete="CASCADE"))
+    rating = db.Column(db.SmallInteger, nullable=False)  # 1..5
+    comment = db.Column(db.Text)
+    created_at = db.Column(db.DateTime(timezone=True), default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)
+
+# ---------- Files ----------
+class File(db.Model):
+    __tablename__ = "files"
+    id = db.Column(db.BigInteger, primary_key=True)
+    owner_user_id = db.Column(db.BigInteger, db.ForeignKey("users.id", ondelete="SET NULL"))
+    original_name = db.Column(db.String(255), nullable=False)
+    path = db.Column(db.String(1000), nullable=False)
+    content_type = db.Column(db.String(255))
+    size_bytes = db.Column(db.BigInteger)
+    sha256 = db.Column(db.String(64), index=True)
+    visibility = db.Column(db.Enum("private","course","public", name="file_visibility"), nullable=False, default="private")
+    created_at = db.Column(db.DateTime(timezone=True), default=datetime.utcnow)
