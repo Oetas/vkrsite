@@ -2,6 +2,8 @@ import os
 from flask import Flask
 from .extensions import db, migrate, login_manager
 from .auth import auth_bp
+from app.utils import roles_required
+from flask_login import login_required
 
 def create_app():
     app = Flask(
@@ -28,6 +30,12 @@ def create_app():
     @app.route("/")
     def index():
         return "Привет! Это главная страница."
+
+    @app.route("/admin")
+    @login_required
+    @roles_required("admin")
+    def admin_panel():
+        return "Добро пожаловать в админку!"
 
     @app.get("/health")
     def health():
