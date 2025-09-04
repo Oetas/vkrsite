@@ -1,6 +1,7 @@
 from app.extensions import db
 from datetime import datetime
 from sqlalchemy import UniqueConstraint
+from flask_login import UserMixin
 
 # ---------- Roles ----------
 class Role(db.Model):
@@ -20,21 +21,32 @@ user_roles = db.Table(
 )
 
 # ---------- Users / Profiles ----------
-class User(db.Model):
+class User(db.Model, UserMixin):
     __tablename__ = "users"
+
     id = db.Column(db.BigInteger, primary_key=True)
     email = db.Column(db.String(255), unique=True, nullable=False, index=True)
     username = db.Column(db.String(80), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(255), nullable=False)
+
     is_active = db.Column(db.Boolean, default=True, nullable=False)
     last_login_at = db.Column(db.DateTime(timezone=True))
     created_at = db.Column(db.DateTime(timezone=True), default=datetime.utcnow)
     updated_at = db.Column(db.DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    # связи
     roles = db.relationship("Role", secondary=user_roles, backref=db.backref("users", lazy="dynamic"))
     profile = db.relationship("Profile", back_populates="user", uselist=False, cascade="all, delete-orphan")
     courses_created = db.relationship("Course", back_populates="author", cascade="all, delete-orphan")
 
+    # Flask-Login требует is_authenticated, is_active, is_anonymous, get_id — они уже есть в UserMixin
+
+    # удобный метод проверки ролей
+    def has_role(self, role_name: str) -> bool:
+        return any(role.name == role_name for role in self.roles)
+
+    def __repr__(self):
+        return f"<User {self.username}>"
 class Profile(db.Model):
     __tablename__ = "profiles"
     id = db.Column(db.BigInteger, primary_key=True)
