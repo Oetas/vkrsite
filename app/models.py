@@ -2,6 +2,7 @@ from app.extensions import db
 from datetime import datetime
 from sqlalchemy import UniqueConstraint
 from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # ---------- Roles ----------
 class Role(db.Model):
@@ -39,9 +40,16 @@ class User(db.Model, UserMixin):
     profile = db.relationship("Profile", back_populates="user", uselist=False, cascade="all, delete-orphan")
     courses_created = db.relationship("Course", back_populates="author", cascade="all, delete-orphan")
 
-    # Flask-Login требует is_authenticated, is_active, is_anonymous, get_id — они уже есть в UserMixin
+    # 🔑 методы для работы с паролем
+    def set_password(self, password: str) -> None:
+        """Хэшируем и сохраняем пароль"""
+        self.password_hash = generate_password_hash(password)
 
-    # удобный метод проверки ролей
+    def check_password(self, password: str) -> bool:
+        """Проверяем введённый пароль"""
+        return check_password_hash(self.password_hash, password)
+
+    # проверка ролей
     def has_role(self, role_name: str) -> bool:
         return any(role.name == role_name for role in self.roles)
 
@@ -189,3 +197,12 @@ class News(db.Model):
     author_user_id = db.Column(db.BigInteger, db.ForeignKey("users.id", ondelete="SET NULL"))
     created_at = db.Column(db.DateTime(timezone=True), default=datetime.utcnow)
     updated_at = db.Column(db.DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)
+
+class Contact(db.Model):
+    __tablename__ = "contacts"
+    id = db.Column(db.BigInteger, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    email = db.Column(db.String(255), nullable=False)
+    subject = db.Column(db.String(255))
+    message = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime(timezone=True), default=datetime.utcnow)
