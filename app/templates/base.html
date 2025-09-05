@@ -2,53 +2,59 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8">
-  <title>{{ title or "ML-Учебник" }}</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <!-- Bootstrap CDN -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="/static/style.css" rel="stylesheet">
+  <title>{% block title %}ML Site{% endblock %}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='custom.css') }}">
 </head>
 <body>
-<nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom mb-3">
-  <div class="container">
-    <a class="navbar-brand" href="/">ML Site</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div id="nav" class="collapse navbar-collapse">
-      <ul class="navbar-nav me-auto">
-        <li class="nav-item"><a class="nav-link" href="/">Главная</a></li>
-        <li class="nav-item"><a class="nav-link" href="/courses">Курсы</a></li>
-        <li class="nav-item"><a class="nav-link" href="/materials">Материалы</a></li>
-        <li class="nav-item"><a class="nav-link" href="/news">Новости</a></li>
-        <li class="nav-item"><a class="nav-link" href="/faq">FAQ</a></li>
-        <li class="nav-item"><a class="nav-link" href="/contacts">Контакты</a></li>
-      </ul>
+  <header class="bg-light border-bottom">
+    <nav class="container navbar navbar-expand-lg navbar-light">
+      <a class="navbar-brand" href="{{ url_for('main.index') }}">ML-Study</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navMain">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <!-- минимум 10 пунктов меню согласно ТЗ -->
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('main.index') }}">Главная</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('main.courses') }}">Курсы</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('main.lessons') }}">Уроки</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('main.news_list') }}">Новости</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('main.instructors') }}">Преподаватели</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('main.faq') }}">FAQ</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('main.contacts') }}">Контакты</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('main.terms') }}">Условия</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">Вход</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.register') }}">Регистрация</a></li>
+        </ul>
+        <!-- проброс current_user -->
+        <ul class="navbar-nav">
+          {% if current_user.is_authenticated %}
+            <li class="nav-item"><a class="nav-link" href="#">{{ current_user.username }}</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">Выйти</a></li>
+          {% endif %}
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container py-4">
+    {% from "macros.html" import render_breadcrumbs %}
+    {% if breadcrumbs is defined %}
+      {{ render_breadcrumbs(breadcrumbs) }}
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="bg-light border-top mt-5 py-3">
+    <div class="container">
+      <small>© {{ config.get('SITE_NAME', 'ML-Study') }} — автор: ФИО</small>
     </div>
-  </div>
-</nav>
+  </footer>
 
-<div class="container">
-  <!-- Хлебные крошки -->
-  <nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-      {% for name, url in crumbs or [] %}
-        {% if loop.last %}
-          <li class="breadcrumb-item active" aria-current="page">{{ name }}</li>
-        {% else %}
-          <li class="breadcrumb-item"><a href="{{ url }}">{{ name }}</a></li>
-        {% endif %}
-      {% endfor %}
-    </ol>
-  </nav>
-
-  {% block content %}{% endblock %}
-</div>
-
-<footer class="border-top mt-5 py-3">
-  <div class="container small text-muted">© 2025 <Твоё ФИО></div>
-</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
