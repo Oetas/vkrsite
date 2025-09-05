@@ -4,6 +4,7 @@ from .extensions import db, migrate, login_manager
 from .auth import auth_bp
 from app.utils import roles_required
 from flask_login import login_required
+from .main import main_bp
 
 def create_app():
     app = Flask(
@@ -25,6 +26,8 @@ def create_app():
 
     # регистрация блюпринтов
     app.register_blueprint(auth_bp, url_prefix="/auth")
+
+    app.register_blueprint(main_bp)  # без префикса — публичные пути в корне
 
     # тестовые роуты
     @app.route("/")
