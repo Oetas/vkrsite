@@ -1,5 +1,24 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>Контакты</h1>
-<p>Тут будет форма обратной связи.</p>
+  <h1>Контакты</h1>
+
+  <form method="post">
+    <div class="mb-3">
+      <label class="form-label">Имя</label>
+      <input name="name" class="form-control" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Email</label>
+      <input name="email" type="email" class="form-control" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Тема</label>
+      <input name="subject" class="form-control">
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Сообщение</label>
+      <textarea name="message" class="form-control" required></textarea>
+    </div>
+    <button class="btn btn-primary" type="submit">Отправить</button>
+  </form>
 {% endblock %}

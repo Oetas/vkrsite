@@ -1,7 +1,7 @@
 {% extends "base.html" %}
+{% block title %}Главная — ML-Study{% endblock %}
 {% block content %}
-<div class="p-4 bg-light rounded-3">
-  <h1 class="display-6">Добро пожаловать!</h1>
-  <p class="lead mb-0">Это стартовая страница учебного портала по машинному обучению.</p>
-</div>
+  <h1>Добро пожаловать в ML-Study</h1>
+  <p>Коротко о целях проекта...</p>
+  <a class="btn btn-primary" href="{{ url_for('main.courses') }}">Смотреть курсы</a>
 {% endblock %}
