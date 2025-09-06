@@ -12,6 +12,17 @@
 
   <h4>Сообщение</h4>
   <div class="border p-3 mb-3">{{ contact.message | nl2br }}</div>
+  <form method="post" action="{{ url_for('admin.mark_contact_read', contact_id=contact.id) }}">
+  {% if csrf_token is defined %}
+    {{ csrf_token() }}
+  {% endif %}
+  <input type="hidden" name="next" value="{{ url_for('admin.contacts_list') }}">
+  {% if not contact.is_read %}
+    <button class="btn btn-success mb-3">Отметить как прочитанное</button>
+  {% else %}
+    <span class="badge bg-success mb-3">Прочитано</span>
+  {% endif %}
+  </form>
 
   <a class="btn btn-secondary" href="{{ url_for('admin.contacts_list') }}">← Назад</a>
 {% endblock %}
