@@ -3,6 +3,7 @@ from datetime import datetime
 from sqlalchemy import UniqueConstraint
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+from .extensions import db
 
 # ---------- Roles ----------
 class Role(db.Model):
@@ -205,4 +206,5 @@ class Contact(db.Model):
     email = db.Column(db.String(255), nullable=False)
     subject = db.Column(db.String(255))
     message = db.Column(db.Text, nullable=False)
+    is_read = db.Column(db.Boolean, default=False, nullable=False)
     created_at = db.Column(db.DateTime(timezone=True), default=datetime.utcnow)
