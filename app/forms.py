@@ -14,3 +14,10 @@ class LoginForm(FlaskForm):
     email = StringField("Email", validators=[DataRequired(), Email()])
     password = PasswordField("Password", validators=[DataRequired()])
     submit = SubmitField("Login")
+    
+class ContactForm(FlaskForm):
+    name = StringField("Имя", validators=[DataRequired(), Length(max=255)])
+    email = StringField("Email", validators=[DataRequired(), Email(), Length(max=255)])
+    subject = StringField("Тема", validators=[Length(max=255)])
+    message = TextAreaField("Сообщение", validators=[DataRequired(), Length(min=5)])
+    submit = SubmitField("Отправить")
