@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, url_for, redirect, flash
 from app.extensions import db
-from app.models import Course, Lesson, News, Contact  # используй свои модели
+from app.models import Course, Lesson, News, Contact  # используем свои модели
+from app.forms import ContactForm
 
 main_bp = Blueprint("main", __name__)
 
@@ -58,21 +59,23 @@ def news_detail(news_id):
 # Contacts - form
 @main_bp.route("/contacts", methods=["GET", "POST"])
 def contacts():
-    breadcrumbs = [("Contacts", url_for("main.contacts"))]
-    if request.method == "POST":
-        name = request.form.get("name", "")
-        email = request.form.get("email", "")
-        subject = request.form.get("subject", "")
-        message = request.form.get("message", "")
-        if not name or not email or not message:
-            flash("Пожалуйста, заполните имя, email и сообщение.", "danger")
-            return render_template("contacts.html", breadcrumbs=breadcrumbs)
-        contact = Contact(name=name, email=email, subject=subject, message=message)
+    form = ContactForm()
+    breadcrumbs = [("Контакты", url_for("main.contacts"))]
+
+    if form.validate_on_submit():
+        contact = Contact(
+            name=form.name.data.strip(),
+            email=form.email.data.strip(),
+            subject=form.subject.data.strip() if form.subject.data else None,
+            message=form.message.data.strip()
+        )
         db.session.add(contact)
         db.session.commit()
-        flash("Спасибо, сообщение отправлено!", "success")
+        flash("Спасибо — сообщение отправлено. Мы скоро ответим.", "success")
         return redirect(url_for("main.contacts"))
-    return render_template("contacts.html", breadcrumbs=breadcrumbs)
+
+    return render_template("contacts.html", form=form, breadcrumbs=breadcrumbs)
+
 
 # FAQ, Instructors, Terms simple pages
 @main_bp.route("/faq")
