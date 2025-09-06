@@ -1,24 +1,46 @@
 {% extends "base.html" %}
+{% block title %}Контакты — ML-Study{% endblock %}
+
 {% block content %}
+  {% from "macros.html" import render_breadcrumbs %}
+  {{ render_breadcrumbs([("Главная", url_for('main.index')), ("Контакты", None)]) }}
+
   <h1>Контакты</h1>
 
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for cat, msg in messages %}
+        <div class="alert alert-{{ 'success' if cat=='success' else 'danger' }}">{{ msg }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
   <form method="post">
+    {{ form.hidden_tag() }}
+
     <div class="mb-3">
-      <label class="form-label">Имя</label>
-      <input name="name" class="form-control" required>
+      {{ form.name.label(class="form-label") }}
+      {{ form.name(class="form-control") }}
+      {% if form.name.errors %}<div class="text-danger small">{{ form.name.errors[0] }}</div>{% endif %}
     </div>
+
     <div class="mb-3">
-      <label class="form-label">Email</label>
-      <input name="email" type="email" class="form-control" required>
+      {{ form.email.label(class="form-label") }}
+      {{ form.email(class="form-control") }}
+      {% if form.email.errors %}<div class="text-danger small">{{ form.email.errors[0] }}</div>{% endif %}
     </div>
+
     <div class="mb-3">
-      <label class="form-label">Тема</label>
-      <input name="subject" class="form-control">
+      {{ form.subject.label(class="form-label") }}
+      {{ form.subject(class="form-control") }}
     </div>
+
     <div class="mb-3">
-      <label class="form-label">Сообщение</label>
-      <textarea name="message" class="form-control" required></textarea>
+      {{ form.message.label(class="form-label") }}
+      {{ form.message(class="form-control", rows=6) }}
+      {% if form.message.errors %}<div class="text-danger small">{{ form.message.errors[0] }}</div>{% endif %}
     </div>
-    <button class="btn btn-primary" type="submit">Отправить</button>
+
+    <button class="btn btn-primary" type="submit">{{ form.submit.label.text }}</button>
   </form>
 {% endblock %}
