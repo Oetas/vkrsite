@@ -5,6 +5,8 @@ from .auth import auth_bp
 from app.utils import roles_required
 from flask_login import login_required
 from .main import main_bp
+from .admin import admin_bp
+
 
 def create_app():
     app = Flask(
@@ -26,8 +28,13 @@ def create_app():
 
     # регистрация блюпринтов
     app.register_blueprint(auth_bp, url_prefix="/auth")
+    app.register_blueprint(main_bp)          # публичные пути в корне
+    app.register_blueprint(admin_bp, url_prefix="/admin")
 
-    app.register_blueprint(main_bp)  # без префикса — публичные пути в корне
+    # регистрируем фильтр nl2br
+    @app.template_filter("nl2br")
+    def nl2br_filter(s):
+        return s.replace("\n", "<br>\n")
 
     # тестовые роуты
     @app.route("/")
