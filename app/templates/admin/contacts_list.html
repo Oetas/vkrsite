@@ -17,6 +17,24 @@
         <td>{{ c.subject or "-" }}</td>
         <td>{{ c.created_at.strftime("%d.%m.%Y %H:%M") }}</td>
         <td><a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin.contact_detail', contact_id=c.id) }}">Открыть</a></td>
+		<td>
+			{% if not c.is_read %}
+			<form method="post"
+			action="{{ url_for('admin.mark_contact_read', contact_id=c.id) }}"
+			style="display:inline;">
+			{# Если у тебя подключен CSRF (Flask-WTF CSRFProtect) -- оставь строку ниже #}
+			{% if csrf_token is defined %}
+			{{ csrf_token() }}
+			{% endif %}
+				<input type="hidden" name="next" value="{{ request.full_path }}">
+				<button class="btn btn-sm btn-success" type="submit">Отметить прочит.</button>
+				</form>
+			{% else %}
+				<span class="badge bg-success">Прочитано</span>
+			{% endif %}
+
+				<a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin.contact_detail', contact_id=c.id) }}">Открыть</a>
+		</td>
       </tr>
       {% endfor %}
     </tbody>
