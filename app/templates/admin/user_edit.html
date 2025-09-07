@@ -1,0 +1,12 @@
+{% extends "admin/base.html" %}
+{% block admin_content %}
+<h2>Редактирование пользователя</h2>
+<form method="post">
+  {{ form.hidden_tag() }}
+  <div class="mb-3">{{ form.email.label }}{{ form.email(class="form-control") }}</div>
+  <div class="mb-3">{{ form.username.label }}{{ form.username(class="form-control") }}</div>
+  <div class="mb-3">{{ form.is_active() }} {{ form.is_active.label }}</div>
+  <div class="mb-3">{{ form.roles.label }}{{ form.roles(class="form-select") }}</div>
+  <button class="btn btn-primary">{{ form.submit.label.text }}</button>
+</form>
+{% endblock %}

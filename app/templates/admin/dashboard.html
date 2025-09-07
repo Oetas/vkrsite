@@ -1,0 +1,10 @@
+{% extends "admin/base.html" %}
+{% block admin_content %}
+<h2>Админ — Dashboard</h2>
+<div class="row">
+  <div class="col-md-3"><div class="card p-3">Пользователи: {{ users_count }}</div></div>
+  <div class="col-md-3"><div class="card p-3">Курсы: {{ courses_count }}</div></div>
+  <div class="col-md-3"><div class="card p-3">Файлы: {{ files_count }}</div></div>
+  <div class="col-md-3"><div class="card p-3">Заявки: {{ contacts_count }}</div></div>
+</div>
+{% endblock %}

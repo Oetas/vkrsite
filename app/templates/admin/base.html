@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block head %}
+  {{ super() }}
+  <!-- можно подлючить свои стили -->
+{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-md-3">
+    {% include "admin/sidebar.html" %}
+  </div>
+  <div class="col-md-9">
+    {% block admin_content %}{% endblock %}
+  </div>
+</div>
+{% endblock %}
