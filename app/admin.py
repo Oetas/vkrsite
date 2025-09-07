@@ -86,5 +86,31 @@ def export_certificate(user_id, course_id):
                      download_name=filename,
                      mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 
+@admin_bp.route("/export/progress/course/<int:course_id>", methods=["GET"])
+@login_required
+@roles_required("admin", "instructor")
+def export_course_progress(course_id):
+    # собираем данные: для каждого прогресса берем student и lesson
+    # Пример запроса:
+    rows = []
+    from app.models import Progress, Lesson, User, Enrollment
+    # Найти всех прогрессов по курсу (join lessons)
+    qs = db.session.query(
+        User.username, User.email, Lesson.title, Progress.status, Progress.score, Progress.completed_at
+    ).join(Progress, Progress.user_id == User.id
+    ).join(Lesson, Progress.lesson_id == Lesson.id
+    ).filter(Lesson.course_id == course_id).order_by(User.id, Lesson.order_index).all()
+
+    # qs уже список кортежей
+    xlsx_bytes = generate_progress_xlsx(course_id, qs)
+    filename = make_filename(f"progress-course-{course_id}", "xlsx")
+
+    # return as stream
+    return send_file(BytesIO(xlsx_bytes),
+                     as_attachment=True,
+                     download_name=filename,
+                     mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
+
 
 

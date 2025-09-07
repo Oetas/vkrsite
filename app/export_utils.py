@@ -7,6 +7,8 @@ from flask import current_app
 from docx import Document
 from docx.shared import Pt
 from datetime import datetime
+from openpyxl import Workbook
+from openpyxl.utils import get_column_letter
 
 def make_filename(prefix, ext):
     name = f"{prefix}-{uuid4().hex}.{ext}"
@@ -61,5 +63,35 @@ def generate_certificate_docx(user, course, issuer_name="Московский у
     # Сохраняем в байты
     bio = io.BytesIO()
     doc.save(bio)
+    bio.seek(0)
+    return bio.getvalue()
+
+def generate_progress_xlsx(course_id, rows):
+    """
+    rows: iterable of tuples (student_name, email, lesson_title, status, score, completed_at)
+    Возвращает bytes xlsx
+    """
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Progress"
+
+    headers = ["Student", "Email", "Lesson", "Status", "Score", "Completed At"]
+    ws.append(headers)
+
+    for r in rows:
+        # completed_at -> string
+        ca = r[5].strftime("%Y-%m-%d %H:%M") if r[5] else ""
+        ws.append([r[0], r[1], r[2], r[3], float(r[4]) if r[4] is not None else "", ca])
+
+    # auto width
+    for i, col in enumerate(ws.columns, 1):
+        max_length = 0
+        for cell in col:
+            if cell.value:
+                max_length = max(max_length, len(str(cell.value)))
+        ws.column_dimensions[get_column_letter(i)].width = min(max_length + 2, 50)
+
+    bio = io.BytesIO()
+    wb.save(bio)
     bio.seek(0)
     return bio.getvalue()
