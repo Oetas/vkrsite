@@ -12,6 +12,8 @@ from app.export_utils import generate_certificate_docx, make_filename, save_byte
 from app.models import Course, User
 from app.export_utils import generate_progress_xlsx, generate_stats_xlsx
 from app.models import User, Course, Lesson, Progress, Enrollment, File
+from app.forms import AdminUserForm, CourseForm
+from sqlalchemy import func
 
 
 
@@ -144,4 +146,125 @@ def export_course_stats(course_id):
                      download_name=filename,
                      mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
+
+# --- Dashboard ---
+@admin_bp.route("/")
+@login_required
+@roles_required("admin")
+def dashboard():
+    users_count = db.session.query(func.count(User.id)).scalar()
+    courses_count = db.session.query(func.count(Course.id)).scalar()
+    files_count = db.session.query(func.count(File.id)).scalar()
+    contacts_count = db.session.query(func.count(Contact.id)).scalar()
+    return render_template("admin/dashboard.html",
+                           users_count=users_count,
+                           courses_count=courses_count,
+                           files_count=files_count,
+                           contacts_count=contacts_count)
+
+# --- Users list ---
+@admin_bp.route("/users")
+@login_required
+@roles_required("admin")
+def users_list():
+    page = request.args.get("page", 1, type=int)
+    q = request.args.get("q", "")
+    qs = User.query
+    if q:
+        qs = qs.filter((User.username.ilike(f"%{q}%")) | (User.email.ilike(f"%{q}%")))
+    pagination = qs.order_by(User.created_at.desc()).paginate(page=page, per_page=20, error_out=False)
+    return render_template("admin/users_list.html", pagination=pagination, q=q)
+
+# --- Edit user (view + save) ---
+@admin_bp.route("/users/<int:user_id>/edit", methods=["GET","POST"])
+@login_required
+@roles_required("admin")
+def user_edit(user_id):
+    user = User.query.get_or_404(user_id)
+    form = AdminUserForm(obj=user)
+    # populate role choices
+    roles = Role.query.order_by(Role.name).all()
+    form.roles.choices = [(r.id, r.name) for r in roles]
+    # preselect first role if exists (or user's first)
+    if request.method == "GET":
+        if user.roles:
+            form.roles.data = user.roles[0].id
+
+    if form.validate_on_submit():
+        user.email = form.email.data.strip()
+        user.username = form.username.data.strip()
+        user.is_active = bool(form.is_active.data)
+        # assign role (simple: replace roles with selected)
+        selected_role = Role.query.get(form.roles.data)
+        if selected_role:
+            user.roles = [selected_role]
+        db.session.commit()
+        flash("User saved", "success")
+        return redirect(url_for("admin.users_list"))
+    return render_template("admin/user_edit.html", user=user, form=form)
+
+# --- Courses list/create/edit/delete ---
+@admin_bp.route("/courses")
+@login_required
+@roles_required("admin", "instructor")
+def courses_list():
+    page = request.args.get("page", 1, type=int)
+    pagination = Course.query.order_by(Course.created_at.desc()).paginate(page=page, per_page=20, error_out=False)
+    return render_template("admin/courses_list.html", pagination=pagination)
+
+@admin_bp.route("/courses/create", methods=["GET","POST"])
+@login_required
+@roles_required("admin", "instructor")
+def course_create():
+    form = CourseForm()
+    if form.validate_on_submit():
+        course = Course(
+            title=form.title.data.strip(),
+            slug=form.slug.data.strip(),
+            description=form.description.data,
+            level=form.level.data,
+            is_published=bool(form.is_published.data),
+            created_by=current_user.id
+        )
+        db.session.add(course)
+        db.session.commit()
+        flash("Course created", "success")
+        return redirect(url_for("admin.courses_list"))
+    return render_template("admin/course_edit.html", form=form)
+
+@admin_bp.route("/courses/<int:course_id>/edit", methods=["GET","POST"])
+@login_required
+@roles_required("admin", "instructor")
+def course_edit(course_id):
+    course = Course.query.get_or_404(course_id)
+    form = CourseForm(obj=course)
+    if form.validate_on_submit():
+        course.title = form.title.data.strip()
+        course.slug = form.slug.data.strip()
+        course.description = form.description.data
+        course.level = form.level.data
+        course.is_published = bool(form.is_published.data)
+        db.session.commit()
+        flash("Course saved", "success")
+        return redirect(url_for("admin.courses_list"))
+    return render_template("admin/course_edit.html", form=form, course=course)
+
+@admin_bp.route("/courses/<int:course_id>/delete", methods=["POST"])
+@login_required
+@roles_required("admin", "instructor")
+def course_delete(course_id):
+    course = Course.query.get_or_404(course_id)
+    db.session.delete(course)
+    db.session.commit()
+    flash("Course deleted", "success")
+    return redirect(url_for("admin.courses_list"))
+
+# --- Reports list (example) ---
+@admin_bp.route("/reports")
+@login_required
+@roles_required("admin")
+def reports_list():
+    page = request.args.get("page", 1, type=int)
+    pagination = Report.query.order_by(Report.created_at.desc()).paginate(page=page, per_page=20, error_out=False)
+    return render_template("admin/reports_list.html", pagination=pagination)
 
