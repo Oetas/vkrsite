@@ -112,5 +112,32 @@ def export_course_progress(course_id):
                      mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
 
+@admin_bp.route("/export/stats/course/<int:course_id>", methods=["GET"])
+@login_required
+@roles_required("admin", "instructor")
+def export_course_stats(course_id):
+    from sqlalchemy import func
+    # подсчёты:
+    total_enrolled = db.session.query(func.count(Enrollment.id)).filter(Enrollment.course_id==course_id).scalar()
+    # завершили — enrollment статус == 'completed'
+    completed = db.session.query(func.count(Enrollment.id)).filter(Enrollment.course_id==course_id, Enrollment.status=='completed').scalar()
+    # avg score — средний по прогресс для уроков курса
+    avg_score = db.session.query(func.avg(Progress.score)).join(Lesson, Progress.lesson_id==Lesson.id).filter(Lesson.course_id==course_id).scalar() or 0
+
+    completion_rate = f"{(completed / total_enrolled * 100) if total_enrolled else 0:.2f}%"
+
+    rows = [
+        ("Course ID", course_id),
+        ("Total enrolled", total_enrolled),
+        ("Completed", completed),
+        ("Completion rate", completion_rate),
+        ("Avg score", round(float(avg_score),2) if avg_score else 0),
+    ]
+    xlsx_bytes = generate_stats_xlsx(rows, title=f"course-{course_id}-stats")
+    filename = make_filename(f"course-{course_id}-stats", "xlsx")
+    return send_file(BytesIO(xlsx_bytes),
+                     as_attachment=True,
+                     download_name=filename,
+                     mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
 

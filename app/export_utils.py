@@ -95,3 +95,18 @@ def generate_progress_xlsx(course_id, rows):
     wb.save(bio)
     bio.seek(0)
     return bio.getvalue()
+
+def generate_stats_xlsx(stats_rows, title="Statistics"):
+    wb = Workbook()
+    ws = wb.active
+    ws.title = title
+
+    headers = ["Metric", "Value"]
+    ws.append(headers)
+    for k, v in stats_rows:
+        ws.append([k, v])
+
+    bio = io.BytesIO()
+    wb.save(bio)
+    bio.seek(0)
+    return bio.getvalue()
