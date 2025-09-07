@@ -10,7 +10,9 @@ from flask import send_file, make_response
 from io import BytesIO
 from app.export_utils import generate_certificate_docx, make_filename, save_bytes_to_uploads
 from app.models import Course, User
-from app.export_utils import generate_progress_xlsx
+from app.export_utils import generate_progress_xlsx, generate_stats_xlsx
+from app.models import User, Course, Lesson, Progress, Enrollment, File
+
 
 
 
@@ -129,11 +131,11 @@ def export_course_stats(course_id):
     completion_rate = f"{(completed / total_enrolled * 100) if total_enrolled else 0:.2f}%"
 
     rows = [
-        ("Course ID", course_id),
-        ("Total enrolled", total_enrolled),
-        ("Completed", completed),
-        ("Completion rate", completion_rate),
-        ("Avg score", round(float(avg_score),2) if avg_score else 0),
+        ("ID курса", course_id),
+        ("Кол-во зачисленных", total_enrolled),
+        ("Завершенные", completed),
+        ("Коэффициет завершенных работ", completion_rate),
+        ("Средний балл", round(float(avg_score),2) if avg_score else 0),
     ]
     xlsx_bytes = generate_stats_xlsx(rows, title=f"course-{course_id}-stats")
     filename = make_filename(f"course-{course_id}-stats", "xlsx")

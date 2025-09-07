@@ -101,7 +101,7 @@ def generate_stats_xlsx(stats_rows, title="Statistics"):
     ws = wb.active
     ws.title = title
 
-    headers = ["Metric", "Value"]
+    headers = ["Показатель", "Значение"]
     ws.append(headers)
     for k, v in stats_rows:
         ws.append([k, v])
