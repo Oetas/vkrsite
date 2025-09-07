@@ -2,6 +2,14 @@ from flask import Blueprint, render_template, request, url_for, redirect, flash
 from app.extensions import db
 from app.models import Course, Lesson, News, Contact  # используем свои модели
 from app.forms import ContactForm
+import os
+from flask import current_app, request, flash, redirect, url_for, render_template, send_from_directory, abort
+from flask_login import login_required, current_user
+from app.forms import FileUploadForm
+from app.extensions import db
+from app.models import File
+from app.utils import save_uploaded_file
+
 
 main_bp = Blueprint("main", __name__)
 
@@ -92,3 +100,67 @@ def instructors():
 def terms():
     breadcrumbs = [("Terms", url_for("main.terms"))]
     return render_template("terms.html", breadcrumbs=breadcrumbs)
+
+@main_bp.route("/files/upload", methods=["GET", "POST"])
+@login_required
+def upload_file():
+    form = FileUploadForm()
+    if form.validate_on_submit():
+        f = form.file.data
+        try:
+            stored_name, original_name, size, content_type = save_uploaded_file(
+                f,
+                current_app.config["UPLOAD_FOLDER"],
+                current_app.config["ALLOWED_UPLOAD_EXTENSIONS"]
+            )
+        except ValueError:
+            flash("Неподдерживаемый формат файла", "danger")
+            return redirect(url_for("main.upload_file"))
+
+        # create DB record
+        new_file = File(
+            owner_user_id=current_user.id,
+            original_name=original_name,
+            path=stored_name,
+            content_type=content_type,
+            size_bytes=size,
+            visibility="private"  # по умолчанию приватный
+        )
+        db.session.add(new_file)
+        db.session.commit()
+        flash("Файл загружен успешно", "success")
+        return redirect(url_for("main.user_files"))
+
+    return render_template("files/upload.html", form=form)
+
+@main_bp.route("/files")
+@login_required
+def user_files():
+    page = request.args.get("page", 1, type=int)
+    per_page = 20
+    pagination = File.query.filter(
+        (File.owner_user_id == current_user.id) | (File.visibility != "private")
+    ).order_by(File.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
+    return render_template("files/list.html", pagination=pagination)
+
+@main_bp.route("/files/<int:file_id>/download")
+@login_required
+def download_file(file_id):
+    file = File.query.get_or_404(file_id)
+
+    # Правила доступа:
+    # - владелец
+    # - админ (если у тебя есть роль)
+    # - или файл не приватный (visibility != 'private')
+    if file.owner_user_id != current_user.id and not current_user.has_role("admin") and file.visibility == "private":
+        abort(403)
+
+    uploads = current_app.config["UPLOAD_FOLDER"]
+    # send_from_directory безопасно, не отдаёт файлы вне папки
+    # modern Flask: use download_name; older: attachment_filename
+    try:
+        return send_from_directory(uploads, file.path, as_attachment=True, download_name=file.original_name)
+    except TypeError:
+        # Fallback для старых версий Flask
+        return send_from_directory(uploads, file.path, as_attachment=True, attachment_filename=file.original_name)
+

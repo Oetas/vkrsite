@@ -36,4 +36,14 @@ def mark_contact_read(contact_id):
     next_url = request.form.get("next") or url_for("admin.contacts_list")
     return redirect(next_url)
 
+@admin_bp.route("/files")
+@login_required
+@roles_required("admin")
+def admin_files():
+    page = request.args.get("page", 1, type=int)
+    per_page = 50
+    pagination = File.query.order_by(File.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
+    return render_template("admin/files_list.html", pagination=pagination)
+
+
 
