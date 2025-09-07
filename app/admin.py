@@ -5,6 +5,7 @@ from app.utils import roles_required
 from app.extensions import db
 from app.models import Contact
 from app.decorators import admin_required
+from app.models import File
 
 admin_bp = Blueprint("admin", __name__, template_folder="templates", url_prefix="/admin")
 
