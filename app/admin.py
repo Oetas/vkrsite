@@ -14,8 +14,7 @@ from app.export_utils import generate_progress_xlsx, generate_stats_xlsx
 from app.models import User, Course, Lesson, Progress, Enrollment, File
 from app.forms import AdminUserForm, CourseForm
 from sqlalchemy import func
-
-
+from app.utils import make_breadcrumbs
 
 
 admin_bp = Blueprint("admin", __name__, template_folder="templates", url_prefix="/admin")
@@ -209,8 +208,21 @@ def user_edit(user_id):
 @roles_required("admin", "instructor")
 def courses_list():
     page = request.args.get("page", 1, type=int)
-    pagination = Course.query.order_by(Course.created_at.desc()).paginate(page=page, per_page=20, error_out=False)
-    return render_template("admin/courses_list.html", pagination=pagination)
+    pagination = Course.query.order_by(Course.created_at.desc()).paginate(
+        page=page, per_page=20, error_out=False
+    )
+
+    # хлебные крошки: "Панель > Курсы"
+    breadcrumbs = make_breadcrumbs(
+        ("Панель", "admin.dashboard", None),
+        ("Курсы", None, None)
+    )
+
+    return render_template(
+        "admin/courses_list.html",
+        pagination=pagination,
+        breadcrumbs=breadcrumbs
+    )
 
 @admin_bp.route("/courses/create", methods=["GET","POST"])
 @login_required
@@ -238,6 +250,7 @@ def course_create():
 def course_edit(course_id):
     course = Course.query.get_or_404(course_id)
     form = CourseForm(obj=course)
+
     if form.validate_on_submit():
         course.title = form.title.data.strip()
         course.slug = form.slug.data.strip()
@@ -247,7 +260,20 @@ def course_edit(course_id):
         db.session.commit()
         flash("Course saved", "success")
         return redirect(url_for("admin.courses_list"))
-    return render_template("admin/course_edit.html", form=form, course=course)
+
+    # хлебные крошки: "Панель > Курсы > Редактирование"
+    breadcrumbs = make_breadcrumbs(
+        ("Панель", "admin.dashboard", None),
+        ("Курсы", "admin.courses_list", None),
+        ("Редактирование", None, None)
+    )
+
+    return render_template(
+        "admin/course_edit.html",
+        form=form,
+        course=course,
+        breadcrumbs=breadcrumbs
+    )
 
 @admin_bp.route("/courses/<int:course_id>/delete", methods=["POST"])
 @login_required
@@ -267,4 +293,36 @@ def reports_list():
     page = request.args.get("page", 1, type=int)
     pagination = Report.query.order_by(Report.created_at.desc()).paginate(page=page, per_page=20, error_out=False)
     return render_template("admin/reports_list.html", pagination=pagination)
+
+@admin_bp.route("/users")
+@login_required
+@roles_required("admin")
+def users_list():
+    page = request.args.get("page", 1, type=int)
+    q = request.args.get("q", "")
+    qs = User.query
+    if q:
+        qs = qs.filter((User.username.ilike(f"%{q}%")) | (User.email.ilike(f"%{q}%")))
+    pagination = qs.order_by(User.created_at.desc()).paginate(page=page, per_page=20, error_out=False)
+
+    breadcrumbs = make_breadcrumbs(
+        ("Панель", "admin.dashboard", None),
+        ("Пользователи", None, None)  # текущая страница — без ссылки
+    )
+    return render_template("admin/users_list.html", pagination=pagination, q=q, breadcrumbs=breadcrumbs)
+
+@admin_bp.route("/users/<int:user_id>/edit", methods=["GET","POST"])
+@login_required
+@roles_required("admin")
+def user_edit(user_id):
+    user = User.query.get_or_404(user_id)
+    form = AdminUserForm(obj=user)
+    # ... (логика формы)
+
+    breadcrumbs = make_breadcrumbs(
+        ("Панель", "admin.dashboard", None),
+        ("Пользователи", "admin.users_list", None),
+        ("Редактирование", None, None)   # последний — текущая страница
+    )
+    return render_template("admin/user_edit.html", user=user, form=form, breadcrumbs=breadcrumbs)
 
