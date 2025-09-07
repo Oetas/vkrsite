@@ -10,6 +10,8 @@ from flask import send_file, make_response
 from io import BytesIO
 from app.export_utils import generate_certificate_docx, make_filename, save_bytes_to_uploads
 from app.models import Course, User
+from app.export_utils import generate_progress_xlsx
+
 
 
 admin_bp = Blueprint("admin", __name__, template_folder="templates", url_prefix="/admin")

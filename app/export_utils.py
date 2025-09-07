@@ -75,7 +75,7 @@ def generate_progress_xlsx(course_id, rows):
     ws = wb.active
     ws.title = "Progress"
 
-    headers = ["Student", "Email", "Lesson", "Status", "Score", "Completed At"]
+    headers = ["Студент", "Email", "Урок", "Статус", "Счет", "Выполнено:"]
     ws.append(headers)
 
     for r in rows:
