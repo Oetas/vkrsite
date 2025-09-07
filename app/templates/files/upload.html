@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Загрузить файл{% endblock %}
+
+{% block content %}
+  <h1>Загрузка файла</h1>
+
+  <form method="post" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    <div class="mb-3">
+      {{ form.file.label(class="form-label") }}
+      {{ form.file(class="form-control") }}
+      {% if form.file.errors %}
+        <div class="text-danger small">{{ form.file.errors[0] }}</div>
+      {% endif %}
+    </div>
+    <button class="btn btn-primary">{{ form.submit.label.text }}</button>
+  </form>
+{% endblock %}
