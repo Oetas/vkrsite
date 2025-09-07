@@ -6,6 +6,7 @@ import os
 from uuid import uuid4
 from werkzeug.utils import secure_filename
 
+
 def roles_required(*roles):
     """
     Декоратор: проверяет, что у юзера есть хотя бы одна из ролей
@@ -23,20 +24,31 @@ def roles_required(*roles):
 
 def make_breadcrumbs(*items):
     """
-    items — список кортежей: (label, endpoint_or_url, endpoint_args_dict)
-    Для endpoint_or_url можно передать URL напрямую или имя endpoint
+    items: список кортежей (label, endpoint_or_url_or_none, kwargs_or_none)
+
+    - endpoint_or_url может быть:
+      * None            -> текущая (не кликабельная) позиция
+      * имя endpoint    -> будет применён url_for(endpoint, **kwargs)
+      * строка URL      -> если начинается с '/' или 'http' — используется как есть
+
+    Возвращает: список dict {'label': ..., 'url': ...} (url == None для текущей страницы).
     """
-    result = []
-    for label, endpoint_or_url, args in items:
+    out = []
+    for label, endpoint_or_url, kwargs in items:
         if endpoint_or_url is None:
-            result.append((label, None))
+            url = None
         else:
-            try:
-                url = url_for(endpoint_or_url, **(args or {}))
-            except Exception:
+            # если явно передали путь/ссылку — используем её
+            if isinstance(endpoint_or_url, str) and (endpoint_or_url.startswith("/") or endpoint_or_url.startswith("http")):
                 url = endpoint_or_url
-            result.append((label, url))
-    return result
+            else:
+                try:
+                    url = url_for(endpoint_or_url, **(kwargs or {}))
+                except Exception:
+                    # если не получилось — безопасно ставим None
+                    url = None
+        out.append({"label": label, "url": url})
+    return out
 
 def allowed_file(filename, allowed_set):
     if "." not in filename:
@@ -62,3 +74,16 @@ def save_uploaded_file(storage_file, upload_dir, allowed_exts):
     size = os.path.getsize(dest_path)
     content_type = storage_file.mimetype or None
     return unique_name, orig_secure, size, content_type
+
+def make_breadcrumbs(*items):
+    """
+    items: list of tuples (label, endpoint, kwargs)
+    returns: list of dicts with 'label' and 'url' (None if endpoint is None)
+    """
+    out = []
+    for label, endpoint, ep_kwargs in items:
+        url = None
+        if endpoint:
+            url = url_for(endpoint, **(ep_kwargs or {}))
+        out.append({"label": label, "url": url})
+    return out
