@@ -6,6 +6,11 @@ from app.extensions import db
 from app.models import Contact
 from app.decorators import admin_required
 from app.models import File
+from flask import send_file, make_response
+from io import BytesIO
+from app.export_utils import generate_certificate_docx, make_filename, save_bytes_to_uploads
+from app.models import Course, User
+
 
 admin_bp = Blueprint("admin", __name__, template_folder="templates", url_prefix="/admin")
 
@@ -45,6 +50,41 @@ def admin_files():
     per_page = 50
     pagination = File.query.order_by(File.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
     return render_template("admin/files_list.html", pagination=pagination)
+
+@admin_bp.route("/export/certificate/<int:user_id>/<int:course_id>", methods=["GET"])
+@login_required
+@roles_required("admin", "instructor")  # кто может выдавать сертификаты
+def export_certificate(user_id, course_id):
+    user = User.query.get_or_404(user_id)
+    course = Course.query.get_or_404(course_id)
+
+    doc_bytes = generate_certificate_docx(user, course)
+
+    filename = make_filename(f"certificate-{user.username}-{course.slug}", "docx")
+
+    # Опция: сохраняем файл в uploads и создаём запись
+    save_to_disk = True
+    if save_to_disk:
+        stored_name, size = save_bytes_to_uploads(doc_bytes, filename)
+        # записать в БД
+        new_file = File(
+            owner_user_id = None,  # можно указать issuer/admin, или user.id
+            original_name = filename,
+            path = stored_name,
+            content_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            size_bytes = size,
+            visibility = "private"
+        )
+        db.session.add(new_file)
+        db.session.commit()
+        # вернуть ссылку для скачивания (через /files/<id>/download) или отдать сразу
+        return redirect(url_for("main.download_file", file_id=new_file.id))
+
+    # или вернуть в памяти
+    return send_file(BytesIO(doc_bytes),
+                     as_attachment=True,
+                     download_name=filename,
+                     mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 
 
 
