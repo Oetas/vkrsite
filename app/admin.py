@@ -50,11 +50,30 @@ def mark_contact_read(contact_id):
 @admin_bp.route("/files")
 @login_required
 @roles_required("admin")
-def admin_files():
+def files_list():
+    """
+    Админский список файлов — endpoint: admin.files_list
+    (имя функции определяет endpoint, поэтому называем files_list чтобы совпадало с шаблоном).
+    """
     page = request.args.get("page", 1, type=int)
     per_page = 50
-    pagination = File.query.order_by(File.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
-    return render_template("admin/files_list.html", pagination=pagination)
+
+    # выборка с пагинацией
+    pagination = File.query.order_by(File.created_at.desc()).paginate(
+        page=page, per_page=per_page, error_out=False
+    )
+
+    # хлебные крошки для админки
+    breadcrumbs = make_breadcrumbs(
+        ("Панель", "admin.dashboard", None),
+        ("Файлы", None, None)
+    )
+
+    return render_template(
+        "admin/files_list.html",
+        pagination=pagination,
+        breadcrumbs=breadcrumbs
+    )
 
 @admin_bp.route("/export/certificate/<int:user_id>/<int:course_id>", methods=["GET"])
 @login_required
@@ -161,29 +180,19 @@ def dashboard():
                            files_count=files_count,
                            contacts_count=contacts_count)
 
-# --- Users list ---
-@admin_bp.route("/users")
-@login_required
-@roles_required("admin")
-def users_list():
-    page = request.args.get("page", 1, type=int)
-    q = request.args.get("q", "")
-    qs = User.query
-    if q:
-        qs = qs.filter((User.username.ilike(f"%{q}%")) | (User.email.ilike(f"%{q}%")))
-    pagination = qs.order_by(User.created_at.desc()).paginate(page=page, per_page=20, error_out=False)
-    return render_template("admin/users_list.html", pagination=pagination, q=q)
 
 # --- Edit user (view + save) ---
-@admin_bp.route("/users/<int:user_id>/edit", methods=["GET","POST"])
+@admin_bp.route("/users/<int:user_id>/edit", methods=["GET", "POST"])
 @login_required
 @roles_required("admin")
 def user_edit(user_id):
     user = User.query.get_or_404(user_id)
     form = AdminUserForm(obj=user)
+
     # populate role choices
     roles = Role.query.order_by(Role.name).all()
     form.roles.choices = [(r.id, r.name) for r in roles]
+
     # preselect first role if exists (or user's first)
     if request.method == "GET":
         if user.roles:
@@ -193,14 +202,24 @@ def user_edit(user_id):
         user.email = form.email.data.strip()
         user.username = form.username.data.strip()
         user.is_active = bool(form.is_active.data)
+
         # assign role (simple: replace roles with selected)
         selected_role = Role.query.get(form.roles.data)
         if selected_role:
             user.roles = [selected_role]
+
         db.session.commit()
         flash("User saved", "success")
         return redirect(url_for("admin.users_list"))
-    return render_template("admin/user_edit.html", user=user, form=form)
+
+    # добавляем хлебные крошки
+    breadcrumbs = make_breadcrumbs(
+        ("Панель", "admin.dashboard", None),
+        ("Пользователи", "admin.users_list", None),
+        ("Редактирование", None, None)   # текущая страница
+    )
+
+    return render_template("admin/user_edit.html", user=user, form=form, breadcrumbs=breadcrumbs)
 
 # --- Courses list/create/edit/delete ---
 @admin_bp.route("/courses")
@@ -310,19 +329,3 @@ def users_list():
         ("Пользователи", None, None)  # текущая страница — без ссылки
     )
     return render_template("admin/users_list.html", pagination=pagination, q=q, breadcrumbs=breadcrumbs)
-
-@admin_bp.route("/users/<int:user_id>/edit", methods=["GET","POST"])
-@login_required
-@roles_required("admin")
-def user_edit(user_id):
-    user = User.query.get_or_404(user_id)
-    form = AdminUserForm(obj=user)
-    # ... (логика формы)
-
-    breadcrumbs = make_breadcrumbs(
-        ("Панель", "admin.dashboard", None),
-        ("Пользователи", "admin.users_list", None),
-        ("Редактирование", None, None)   # последний — текущая страница
-    )
-    return render_template("admin/user_edit.html", user=user, form=form, breadcrumbs=breadcrumbs)
-
