@@ -1,12 +1,7 @@
 import os
 from flask import Flask
 from .extensions import db, migrate, login_manager
-from .auth import auth_bp
-from app.utils import roles_required
-from flask_login import login_required
-from .main import main_bp
-from .admin import admin_bp
-
+from .dashboard import dashboard_bp
 
 def create_app():
     app = Flask(
@@ -15,6 +10,10 @@ def create_app():
         static_folder="static"
     )
     app.config.from_object("config.Config")
+    app.register_blueprint(dashboard_bp, url_prefix="/dashboard")
+
+    # Ensure uploads folder exists
+    os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
     # init extensions
     db.init_app(app)
@@ -26,6 +25,11 @@ def create_app():
     # импорт моделей (чтобы Alembic их видел)
     from app import models  # noqa
 
+    # Импорт блюпринтов локально — для избежания циклических импортов
+    from .auth import auth_bp
+    from .main import main_bp
+    from .admin import admin_bp
+
     # регистрация блюпринтов
     app.register_blueprint(auth_bp, url_prefix="/auth")
     app.register_blueprint(main_bp)          # публичные пути в корне
@@ -36,16 +40,10 @@ def create_app():
     def nl2br_filter(s):
         return s.replace("\n", "<br>\n")
 
-    # тестовые роуты
+    # тестовые роуты (по желанию — можно удалить)
     @app.route("/")
     def index():
         return "Привет! Это главная страница."
-
-    @app.route("/admin")
-    @login_required
-    @roles_required("admin")
-    def admin_panel():
-        return "Добро пожаловать в админку!"
 
     @app.get("/health")
     def health():

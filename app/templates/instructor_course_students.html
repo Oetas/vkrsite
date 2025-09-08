@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Студенты курса: {{ course.title }}</h1>
+<ul>
+  {% for s in students %}
+    <li>{{ s.username }} / {{ s.email }}</li>
+  {% endfor %}
+</ul>
+{% endblock %}

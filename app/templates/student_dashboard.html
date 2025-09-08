@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Личный кабинет — студент</h1>
+<p>Зачислен на курсов: {{ enrolled_count }}</p>
+
+<h3>Сертификаты</h3>
+{% if certs %}
+  <ul>
+    {% for f in certs %}
+      <li><a href="{{ url_for('main.download_file', file_id=f.id) }}">{{ f.original_name }}</a> ({{ f.created_at.strftime("%Y-%m-%d") }})</li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>Нет сертификатов</p>
+{% endif %}
+
+<p><a class="btn btn-primary" href="{{ url_for('dashboard.student_courses') }}">Мои курсы</a></p>
+{% endblock %}
