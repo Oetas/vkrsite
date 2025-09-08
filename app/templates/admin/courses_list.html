@@ -26,10 +26,9 @@
       <td>{{ c.level }}</td>
       <td>{{ "✔" if c.is_published else "✖" }}</td>
       <td>
-        <a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin.course_edit', course_id=c.id) }}">Edit</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin.course_edit', course_id=c.id) }}">Редактировать</a>
         <form method="post" action="{{ url_for('admin.course_delete', course_id=c.id) }}" style="display:inline;" onsubmit="return confirm('Удалить курс?');">
-          {{ csrf_token() }}
-          <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+          <button type="submit" class="btn btn-sm btn-outline-danger">Удалить</button>
         </form>
       </td>
     </tr>

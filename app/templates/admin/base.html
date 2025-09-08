@@ -1,15 +1,36 @@
 {% extends "base.html" %}
+
 {% block head %}
   {{ super() }}
-  <!-- можно подлючить свои стили -->
+  <!-- можно подключить свои стили -->
 {% endblock %}
+
 {% block content %}
 <div class="row">
   <div class="col-md-3">
     {% include "admin/sidebar.html" %}
   </div>
   <div class="col-md-9">
+
+    {# --- breadcrumbs (будут отображаться над содержимым) --- #}
+    {% if breadcrumbs is defined %}
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Главная</a></li>
+        {% for b in breadcrumbs %}
+          {% if b.url %}
+            <li class="breadcrumb-item"><a href="{{ b.url }}">{{ b.label }}</a></li>
+          {% else %}
+            <li class="breadcrumb-item active" aria-current="page">{{ b.label }}</li>
+          {% endif %}
+        {% endfor %}
+      </ol>
+    </nav>
+    {% endif %}
+
+    {# основной блок для контента админки #}
     {% block admin_content %}{% endblock %}
+
   </div>
 </div>
 {% endblock %}
