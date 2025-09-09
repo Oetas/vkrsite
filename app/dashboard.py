@@ -27,7 +27,7 @@ def index():
     # если админ — оставить редирект на админку
     if current_user.has_role("admin"):
         return redirect(url_for("admin.dashboard"))
-    if current_user.has_role("instructor"):
+    if current_user.has_role("teacher"):
         return redirect(url_for("dashboard.instructor_dashboard"))
     # по умолчанию студент
     return redirect(url_for("dashboard.student_dashboard"))
@@ -116,7 +116,7 @@ def student_messages():
 # --- Instructor: личный кабинет ---
 @dashboard_bp.route("/instructor")
 @login_required
-@roles_required("instructor")
+@roles_required("teacher")
 def instructor_dashboard():
     # краткая статистика: сколько курсов
     my_courses_count = Course.query.filter_by(created_by=current_user.id).count()
@@ -126,7 +126,7 @@ def instructor_dashboard():
 
 @dashboard_bp.route("/instructor/courses")
 @login_required
-@roles_required("instructor")
+@roles_required("teacher")
 def instructor_courses():
     page = request.args.get("page", 1, type=int)
     pagination = Course.query.filter_by(created_by=current_user.id).order_by(Course.created_at.desc()).paginate(page=page, per_page=20, error_out=False)
@@ -136,7 +136,7 @@ def instructor_courses():
 
 @dashboard_bp.route("/instructor/course/<int:course_id>/students")
 @login_required
-@roles_required("instructor")
+@roles_required("teacher")
 def instructor_course_students(course_id):
     # безопасность — убедиться, что текущий пользователь — автор курса
     course = Course.query.get_or_404(course_id)
@@ -152,7 +152,7 @@ def instructor_course_students(course_id):
 # Отчёты — список преподавателя (те, что привязаны к его курсам)
 @dashboard_bp.route("/instructor/reports")
 @login_required
-@roles_required("instructor")
+@roles_required("teacher")
 def instructor_reports():
     # можно фильтровать по курсам текущего инструктора
     course_ids = [c.id for c in Course.query.filter_by(created_by=current_user.id).all()]
