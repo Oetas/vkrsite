@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-4">Преподаватели</h2>
+  <div class="row">
+    {% for t in ["Иван Иванов", "Мария Смирнова", "Дмитрий Петров"] %}
+    <div class="col-md-4 mb-3">
+      <div class="card shadow-sm h-100 text-center">
+        <img src="https://via.placeholder.com/150" class="card-img-top" alt="Преподаватель">
+        <div class="card-body">
+          <h5 class="card-title">{{ t }}</h5>
+          <p class="card-text">Преподаёт: {{ loop.index }} направление<br>Опыт: {{ 2+loop.index }} года</p>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
