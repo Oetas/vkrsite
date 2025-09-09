@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Студенты курса: {{ course.title }}</h2>
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            {% for crumb in breadcrumbs %}
+                <li class="breadcrumb-item">
+                    {% if crumb.url %}
+                        <a href="{{ crumb.url }}">{{ crumb.title }}</a>
+                    {% else %}
+                        {{ crumb.title }}
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ol>
+    </nav>
+
+    {% if students %}
+        <table class="table table-striped mt-3">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>ФИО</th>
+                    <th>Email</th>
+                    <th>Дата регистрации</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ student.full_name or student.username }}</td>
+                        <td>{{ student.email }}</td>
+                        <td>{{ student.created_at.strftime('%d.%m.%Y') if student.created_at else "-" }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="alert alert-info mt-3">
+            В этот курс пока не записан ни один студент.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
