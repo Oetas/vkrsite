@@ -88,7 +88,7 @@ def files_list():
 # ---------- Export (certificate / progress / stats) ----------
 @admin_bp.route("/export/certificate/<int:user_id>/<int:course_id>", methods=["GET"])
 @login_required
-@roles_required("admin", "instructor")
+@roles_required("admin", "teacher")
 def export_certificate(user_id, course_id):
     user = User.query.get_or_404(user_id)
     course = Course.query.get_or_404(course_id)
@@ -125,7 +125,7 @@ def export_certificate(user_id, course_id):
 
 @admin_bp.route("/export/progress/course/<int:course_id>", methods=["GET"])
 @login_required
-@roles_required("admin", "instructor")
+@roles_required("admin", "teacher")
 def export_course_progress(course_id):
     # собираем прогресс по курсу
     qs = db.session.query(
@@ -144,7 +144,7 @@ def export_course_progress(course_id):
 
 @admin_bp.route("/export/stats/course/<int:course_id>", methods=["GET"])
 @login_required
-@roles_required("admin", "instructor")
+@roles_required("admin", "teacher")
 def export_course_stats(course_id):
     total_enrolled = db.session.query(func.count(Enrollment.id)).filter(Enrollment.course_id == course_id).scalar() or 0
     completed = db.session.query(func.count(Enrollment.id)).filter(Enrollment.course_id == course_id, Enrollment.status == 'completed').scalar() or 0
@@ -222,7 +222,7 @@ def user_edit(user_id):
 # ---------- Courses ----------
 @admin_bp.route("/courses")
 @login_required
-@roles_required("admin", "instructor")
+@roles_required("admin", "teacher")
 def courses_list():
     page = request.args.get("page", 1, type=int)
     pagination = Course.query.order_by(Course.created_at.desc()).paginate(page=page, per_page=20, error_out=False)
@@ -239,7 +239,7 @@ def courses_list():
 
 @admin_bp.route("/courses/create", methods=["GET", "POST"])
 @login_required
-@roles_required("admin", "instructor")
+@roles_required("admin", "teacher")
 def course_create():
     form = CourseForm()
     if form.validate_on_submit():
@@ -260,7 +260,7 @@ def course_create():
 
 @admin_bp.route("/courses/<int:course_id>/edit", methods=["GET", "POST"])
 @login_required
-@roles_required("admin", "instructor")
+@roles_required("admin", "teacher")
 def course_edit(course_id):
     course = Course.query.get_or_404(course_id)
     form = CourseForm(obj=course)
@@ -280,7 +280,7 @@ def course_edit(course_id):
 
 @admin_bp.route("/courses/<int:course_id>/delete", methods=["POST"])
 @login_required
-@roles_required("admin", "instructor")
+@roles_required("admin", "teacher")
 def course_delete(course_id):
     course = Course.query.get_or_404(course_id)
     db.session.delete(course)
