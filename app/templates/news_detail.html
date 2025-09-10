@@ -1,16 +1,38 @@
 {% extends "base.html" %}
 
-{% block title %}{{ news.title }}{% endblock %}
+{% block title %}{{ news.title }} — Новости{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <h1>{{ news.title }}</h1>
+    <h1 class="mb-3">{{ news.title }}</h1>
     <p class="text-muted">Опубликовано: {{ news.created_at.strftime("%d.%m.%Y %H:%M") }}</p>
 
-    <div class="mt-3">
+    <div class="mt-4 mb-5">
         {{ news.content | safe }}
     </div>
 
-    <a href="{{ url_for('main.news_list') }}" class="btn btn-secondary mt-4">← Назад к новостям</a>
+    <a href="{{ url_for('main.news_list') }}" class="btn btn-secondary mb-5">← Назад к новостям</a>
+
+    <!-- Блок похожих/последних новостей -->
+    {% if latest_news %}
+    <hr>
+    <h3 class="mt-5 mb-4 text-center">📢 Последние новости</h3>
+    <div class="row">
+        {% for item in latest_news %}
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ item.title }}</h5>
+                    <p class="card-text text-truncate" style="max-height: 3rem;">{{ item.content|striptags|truncate(120) }}</p>
+                    <a href="{{ url_for('main.news_detail', news_id=item.id) }}" class="btn btn-outline-primary btn-sm">Читать</a>
+                </div>
+                <div class="card-footer text-muted small">
+                    {{ item.created_at.strftime("%d.%m.%Y") }}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

@@ -4,26 +4,35 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h1 class="mb-4">Новости</h1>
+    <h1 class="mb-4 text-center">📰 Новости</h1>
 
     {% if news_list %}
-        <ul class="list-group">
-            {% for news in news_list %}
-                <li class="list-group-item">
-                    <h5>
-                        <a href="{{ url_for('main.news_detail', news_id=news.id) }}">
+    <div class="row">
+        {% for news in news_list %}
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a href="{{ url_for('main.news_detail', news_id=news.id) }}" class="stretched-link text-decoration-none">
                             {{ news.title }}
                         </a>
                     </h5>
-                    <small class="text-muted">
-                        Опубликовано: {{ news.created_at.strftime("%d.%m.%Y %H:%M") }}
-                    </small>
-                    <p class="mb-0">{{ news.summary or news.content[:150] ~ "..." }}</p>
-                </li>
-            {% endfor %}
-        </ul>
+                    <p class="card-text text-muted small">
+                        {{ news.created_at.strftime("%d.%m.%Y %H:%M") }}
+                    </p>
+                    <p class="card-text">
+                        {{ news.summary or news.content|striptags|truncate(120) }}
+                    </p>
+                </div>
+                <div class="card-footer text-center">
+                    <a href="{{ url_for('main.news_detail', news_id=news.id) }}" class="btn btn-outline-primary btn-sm">Читать далее</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
     {% else %}
-        <p>Пока нет новостей.</p>
+        <p class="text-center">Пока нет новостей.</p>
     {% endif %}
 </div>
 {% endblock %}
