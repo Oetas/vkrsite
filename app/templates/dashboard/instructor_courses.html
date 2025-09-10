@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Мои курсы</h1>
+{% for c in pagination.items %}
+  <div class="card mb-2">
+    <div class="card-body">
+      <h5>{{ c.title }}</h5>
+      <p>{{ c.description[:160] }}…</p>
+      <a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin.course_edit', course_id=c.id) }}">Редактировать</a>
+      <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('dashboard.instructor_course_students', course_id=c.id) }}">Студенты</a>
+    </div>
+  </div>
+{% endfor %}
+{% include "pagination.html" %}
+{% endblock %}
