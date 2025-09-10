@@ -85,6 +85,26 @@ def files_list():
                            breadcrumbs=breadcrumbs)
 
 
+@admin_bp.post("/files/<int:file_id>/delete")
+def delete_file(file_id):
+    from app.models import UploadedFile
+    file = UploadedFile.query.get_or_404(file_id)
+
+    # Удаляем сам файл с диска, если он существует
+    import os
+    file_path = os.path.join(current_app.config["UPLOAD_FOLDER"], file.filename)
+    if os.path.exists(file_path):
+        os.remove(file_path)
+
+    # Удаляем запись из БД
+    db.session.delete(file)
+    db.session.commit()
+
+    flash(f"Файл {file.filename} удалён.", "success")
+    return redirect(url_for("admin.admin_files"))
+
+
+
 # ---------- Export (certificate / progress / stats) ----------
 @admin_bp.route("/export/certificate/<int:user_id>/<int:course_id>", methods=["GET"])
 @login_required
