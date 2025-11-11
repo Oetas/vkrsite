@@ -1,8 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container py-4">
-  <h2 class="mb-4">FAQ</h2>
+  <h2 class="mb-4">FAQ — Часто задаваемые вопросы</h2>
+
   <div class="accordion" id="faqAccordion">
+
+    <!-- 1 -->
     <div class="accordion-item">
       <h2 class="accordion-header" id="q1">
         <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#a1">
@@ -11,10 +14,12 @@
       </h2>
       <div id="a1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
         <div class="accordion-body">
-          Просто нажмите на вкладку <b>Вход</b> и заполните форму.
+          Просто нажмите на вкладку <b>Регистрация</b> и заполните форму. После подтверждения вы сможете войти в систему.
         </div>
       </div>
     </div>
+
+    <!-- 2 -->
     <div class="accordion-item">
       <h2 class="accordion-header" id="q2">
         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#a2">
@@ -23,10 +28,12 @@
       </h2>
       <div id="a2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
         <div class="accordion-body">
-          Перейдите во вкладку <b>Уроки</b> и выберите интересующий курс.
+          Перейдите во вкладку <b>Курсы</b> и выберите интересующий. После этого нажмите кнопку <b>Открыть</b>, чтобы просмотреть материалы.
         </div>
       </div>
     </div>
+
+    <!-- 3 -->
     <div class="accordion-item">
       <h2 class="accordion-header" id="q3">
         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#a3">
@@ -35,10 +42,81 @@
       </h2>
       <div id="a3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
         <div class="accordion-body">
-          Да, часть материалов доступна бесплатно. Подробности уточняйте у администратора.
+          Да, часть вводных курсов доступна бесплатно. Расширенные модули открываются после регистрации преподавателем.
         </div>
       </div>
     </div>
+
+    <!-- 4 -->
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="q4">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#a4">
+          Какие знания нужны для начала обучения?
+        </button>
+      </h2>
+      <div id="a4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+        <div class="accordion-body">
+          Для базовых курсов достаточно школьной математики и минимальных знаний Python. Для продвинутых — желательно понимать линейную алгебру и основы статистики.
+        </div>
+      </div>
+    </div>
+
+    <!-- 5 -->
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="q5">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#a5">
+          Как отслеживается мой прогресс?
+        </button>
+      </h2>
+      <div id="a5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+        <div class="accordion-body">
+          В личном кабинете отображаются завершённые уроки, результаты тестов и общий процент прохождения курса.
+        </div>
+      </div>
+    </div>
+
+    <!-- 6 -->
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="q6">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#a6">
+          Могу ли я связаться с преподавателем?
+        </button>
+      </h2>
+      <div id="a6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+        <div class="accordion-body">
+          Да, через вкладку <b>Преподаватели</b> можно отправить сообщение или задать вопрос преподавателю выбранного курса.
+        </div>
+      </div>
+    </div>
+
+    <!-- 7 -->
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="q7">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#a7">
+          Где хранятся мои данные?
+        </button>
+      </h2>
+      <div id="a7" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+        <div class="accordion-body">
+          Все персональные данные и прогресс обучения хранятся в защищённой базе данных. Мы не передаём информацию третьим лицам.
+        </div>
+      </div>
+    </div>
+
+    <!-- 8 -->
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="q8">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#a8">
+          Что делать, если я забыл пароль?
+        </button>
+      </h2>
+      <div id="a8" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+        <div class="accordion-body">
+          На странице <b>Вход</b> выберите пункт «Забыли пароль?» и следуйте инструкции для восстановления доступа.
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 {% endblock %}
