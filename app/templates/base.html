@@ -41,11 +41,6 @@
   </header>
 
   <main class="container py-4">
-    {% from "macros.html" import render_breadcrumbs %}
-    {% if breadcrumbs is defined %}
-      {{ render_breadcrumbs(breadcrumbs) }}
-    {% endif %}
-
     {% block content %}{% endblock %}
   </main>
 
