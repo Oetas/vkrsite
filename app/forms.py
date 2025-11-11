@@ -6,16 +6,16 @@ from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms import SelectField, BooleanField
 
 class RegisterForm(FlaskForm):
-    username = StringField("Username", validators=[DataRequired(), Length(min=3, max=80)])
+    username = StringField("Имя пользователя", validators=[DataRequired(), Length(min=3, max=80)])
     email = StringField("Email", validators=[DataRequired(), Email(), Length(max=255)])
-    password = PasswordField("Password", validators=[DataRequired(), Length(min=6)])
-    confirm = PasswordField("Confirm Password", validators=[DataRequired(), EqualTo("password")])
-    submit = SubmitField("Register")
+    password = PasswordField("Пароль", validators=[DataRequired(), Length(min=6)])
+    confirm = PasswordField("Повторите пароль", validators=[DataRequired(), EqualTo("password")])
+    submit = SubmitField("Зарегистрироваться")
 
 class LoginForm(FlaskForm):
     email = StringField("Email", validators=[DataRequired(), Email(), Length(max=255)])
-    password = PasswordField("Password", validators=[DataRequired()])
-    submit = SubmitField("Login")
+    password = PasswordField("Пароль", validators=[DataRequired()])
+    submit = SubmitField("Войти")
 
 class ContactForm(FlaskForm):
     name = StringField("Имя", validators=[DataRequired(), Length(max=255)])
