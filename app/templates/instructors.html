@@ -2,14 +2,43 @@
 {% block content %}
 <div class="container py-4">
   <h2 class="mb-4">Преподаватели</h2>
+
+  {# Русский pluralize: ru_plural(n, one, few, many) #}
+  {% macro ru_plural(n, one, few, many) -%}
+    {%- set n = n|abs %}
+    {%- set n100 = n % 100 %}
+    {% if 11 <= n100 <= 19 %}
+      {{ many }}
+    {% else %}
+      {%- set n10 = n % 10 -%}
+      {% if n10 == 1 %}
+        {{ one }}
+      {% elif n10 >= 2 and n10 <= 4 %}
+        {{ few }}
+      {% else %}
+        {{ many }}
+      {% endif %}
+    {% endif %}
+  {%- endmacro %}
+
   <div class="row">
-    {% for t in ["Иван Иванов", "Мария Смирнова", "Дмитрий Петров"] %}
+    {% set teachers = [
+      {'name': 'Иван Иванов', 'gender': 'male', 'directions': 1, 'exp': 3},
+      {'name': 'Мария Смирнова', 'gender': 'female', 'directions': 2, 'exp': 4},
+      {'name': 'Дмитрий Петров', 'gender': 'male', 'directions': 3, 'exp': 5}
+    ] %}
+
+    {% for t in teachers %}
     <div class="col-md-4 mb-3">
       <div class="card shadow-sm h-100 text-center">
-        <img src="https://via.placeholder.com/150" class="card-img-top" alt="Преподаватель">
+        <img src="{{ url_for('static', filename='img/instructors/' + t.gender + '.png') }}"
+             class="card-img-top" alt="Преподаватель {{ t.name }}">
         <div class="card-body">
-          <h5 class="card-title">{{ t }}</h5>
-          <p class="card-text">Преподаёт: {{ loop.index }} направление<br>Опыт: {{ 2+loop.index }} года</p>
+          <h5 class="card-title">{{ t.name }}</h5>
+          <p class="card-text">
+            Преподаёт: {{ t.directions }} {{ ru_plural(t.directions, 'направление', 'направления', 'направлений') }}<br>
+            Опыт: {{ t.exp }} {{ ru_plural(t.exp, 'год', 'года', 'лет') }}
+          </p>
         </div>
       </div>
     </div>

@@ -1,19 +1,75 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container py-4">
-  <h2 class="mb-4">Lessons</h2>
+  <h2 class="mb-4">Уроки — «Введение в высшую математику»</h2>
   <div class="row">
-    {% for i in range(1,7) %}
+
+    <!-- Урок 1 -->
     <div class="col-md-4 mb-3">
       <div class="card shadow-sm h-100">
         <div class="card-body">
-          <h5 class="card-title">Урок {{ i }}</h5>
-          <p class="card-text">Краткое описание урока №{{ i }}. Здесь можно добавить инфу.</p>
+          <h5 class="card-title">Урок 1. Введение в курс и основные понятия</h5>
+          <p class="card-text">Обзор предмета, области применения высшей математики и ключевых понятий: множества, функции, переменные.</p>
           <a href="#" class="btn btn-primary">Открыть</a>
         </div>
       </div>
     </div>
-    {% endfor %}
+
+    <!-- Урок 2 -->
+    <div class="col-md-4 mb-3">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="card-title">Урок 2. Линейные уравнения и системы</h5>
+          <p class="card-text">Изучение линейных уравнений, методов их решения и анализа систем уравнений с несколькими переменными.</p>
+          <a href="#" class="btn btn-primary">Открыть</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Урок 3 -->
+    <div class="col-md-4 mb-3">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="card-title">Урок 3. Матрицы и определители</h5>
+          <p class="card-text">Основные операции с матрицами, свойства определителей и их роль в решении линейных систем.</p>
+          <a href="#" class="btn btn-primary">Открыть</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Урок 4 -->
+    <div class="col-md-4 mb-3">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="card-title">Урок 4. Векторная алгебра</h5>
+          <p class="card-text">Понятия вектора, скалярное и векторное произведения, применение в геометрии и физике.</p>
+          <a href="#" class="btn btn-primary">Открыть</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Урок 5 -->
+    <div class="col-md-4 mb-3">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="card-title">Урок 5. Пределы и непрерывность</h5>
+          <p class="card-text">Понятие предела функции, свойства непрерывных функций и примеры вычислений пределов.</p>
+          <a href="#" class="btn btn-primary">Открыть</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Урок 6 -->
+    <div class="col-md-4 mb-3">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="card-title">Урок 6. Производная и её применение</h5>
+          <p class="card-text">Основные правила дифференцирования, геометрический смысл производной и практические задачи на экстремумы.</p>
+          <a href="#" class="btn btn-primary">Открыть</a>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 {% endblock %}
