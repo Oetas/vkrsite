@@ -1,7 +1,0 @@
-{% extends "base.html" %}
-{% block content %}
-<h1>Личный кабинет — преподаватель</h1>
-<p>Моих курсов: {{ my_courses_count }}</p>
-<p><a href="{{ url_for('dashboard.instructor_courses') }}" class="btn btn-primary">Мои курсы</a></p>
-<p><a href="{{ url_for('dashboard.instructor_reports') }}" class="btn btn-secondary">Мои отчёты</a></p>
-{% endblock %}

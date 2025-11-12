@@ -86,22 +86,19 @@ def files_list():
 
 
 @admin_bp.post("/files/<int:file_id>/delete")
+@login_required
+@roles_required("admin")
 def delete_file(file_id):
-    from app.models import UploadedFile
-    file = UploadedFile.query.get_or_404(file_id)
-
-    # Удаляем сам файл с диска, если он существует
-    import os
-    file_path = os.path.join(current_app.config["UPLOAD_FOLDER"], file.filename)
+    file = File.query.get_or_404(file_id)
+    file_path = os.path.join(current_app.config["UPLOAD_FOLDER"], file.path)
     if os.path.exists(file_path):
         os.remove(file_path)
 
-    # Удаляем запись из БД
     db.session.delete(file)
     db.session.commit()
+    flash(f"Файл {file.original_name} удалён.", "success")
+    return redirect(url_for("admin.files_list"))
 
-    flash(f"Файл {file.filename} удалён.", "success")
-    return redirect(url_for("admin.admin_files"))
 
 
 

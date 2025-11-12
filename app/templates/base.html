@@ -28,6 +28,21 @@
           <li class="nav-item"><a class="nav-link" href="{{ url_for('main.terms') }}">Условия</a></li>
           <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">Вход</a></li>
           <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.register') }}">Регистрация</a></li>
+		  {% if current_user.is_authenticated and current_user.has_role('admin') %}
+		  <li class="nav-item">
+          <a class="nav-link text-danger fw-bold" href="/admin/">Панель администратора</a>
+          </li>
+         {% endif %}
+		 {% if current_user.is_authenticated and current_user.has_role('teacher') %}
+		<li class="nav-item">
+		<a class="nav-link text-primary fw-bold" href="{{ url_for('dashboard.instructor_dashboard') }}">Панель учителя</a>
+		</li>
+		{% endif %}
+		{% if current_user.is_authenticated and current_user.has_role('student') %}
+		<li class="nav-item">
+		<a class="nav-link text-primary fw-bold" href="{{ url_for('dashboard.student_dashboard') }}">Панель студента</a>
+		</li>
+		{% endif %}
         </ul>
         <!-- проброс current_user -->
         <ul class="navbar-nav">

@@ -1,12 +1,23 @@
 {% extends "admin/base.html" %}
+
 {% block admin_content %}
 <h2>Пользователи</h2>
+
 <form class="mb-3" method="get">
   <input type="text" name="q" value="{{ q }}" placeholder="Поиск" class="form-control" />
 </form>
 
 <table class="table">
-  <thead><tr><th>#</th><th>Имя</th><th>Email</th><th>Роли</th><th>Актив</th><th></th></tr></thead>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Имя</th>
+      <th>Email</th>
+      <th>Роли</th>
+      <th>Актив</th>
+      <th></th>
+    </tr>
+  </thead>
   <tbody>
     {% for u in pagination.items %}
     <tr>
@@ -15,7 +26,9 @@
       <td>{{ u.email }}</td>
       <td>{% for r in u.roles %}{{ r.name }}{% if not loop.last %}, {% endif %}{% endfor %}</td>
       <td>{{ "✔" if u.is_active else "✖" }}</td>
-      <td><a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin.user_edit', user_id=u.id) }}">Edit</a></td>
+      <td>
+        <a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin.user_edit', user_id=u.id) }}">Edit</a>
+      </td>
     </tr>
     {% endfor %}
   </tbody>

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block dashboard_content %}
+<div class="container mt-4">
+  <h2 class="mb-3">Мои отчёты</h2>
+
+  {% if pagination.items %}
+    <ul class="list-group">
+      {% for report in pagination.items %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <div>
+            {{ report.type|upper }} — {{ report.created_at.strftime("%Y-%m-%d %H:%M") }}
+            {% if report.status %}
+              <span class="badge bg-secondary">{{ report.status }}</span>
+            {% endif %}
+          </div>
+          <div>
+            {% if report.file_id %}
+              <a href="{{ url_for('dashboard.download_report', report_id=report.id) }}" 
+                 class="btn btn-sm btn-primary">Скачать</a>
+            {% else %}
+              <span class="text-muted">Нет файла</span>
+            {% endif %}
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+
+    {% include "pagination.html" %}
+  {% else %}
+    <p>Пока нет отчётов.</p>
+  {% endif %}
+</div>
+{% endblock %}

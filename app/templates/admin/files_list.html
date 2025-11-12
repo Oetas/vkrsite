@@ -1,16 +1,7 @@
-{% extends "base.html" %}
+{% extends "admin/base.html" %}
 
-{% block content %}
+{% block admin_content %}
 <div class="container mt-4">
-
-    <!-- Хлебные крошки -->
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-			<li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Главная</a></li>
-			<li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">Панель</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Файлы</li>
-        </ol>
-    </nav>
 
     <h2 class="mb-3">Загруженные файлы</h2>
 
@@ -45,24 +36,8 @@
             </tbody>
         </table>
 
-        <!-- Пагинация -->
-        <nav>
-            <ul class="pagination">
-                {% if pagination.has_prev %}
-                    <li class="page-item">
-                        <a class="page-link" href="{{ url_for('admin.admin_files', page=pagination.prev_num) }}">Назад</a>
-                    </li>
-                {% endif %}
-                <li class="page-item disabled">
-                    <span class="page-link">Стр. {{ pagination.page }} из {{ pagination.pages }}</span>
-                </li>
-                {% if pagination.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="{{ url_for('admin.admin_files', page=pagination.next_num) }}">Вперёд</a>
-                    </li>
-                {% endif %}
-            </ul>
-        </nav>
+        {% include "pagination.html" %}
+
     {% else %}
         <p>Файлов пока нет.</p>
     {% endif %}

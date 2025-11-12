@@ -51,18 +51,14 @@ def lessons():
 # News list
 @main_bp.route("/news")
 def news_list():
-    page = request.args.get("page", 1, type=int)
-    per_page = 8
-    pagination = News.query.order_by(News.published_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
-    breadcrumbs = [("News", url_for("main.news_list"))]
-    return render_template("news_list.html", pagination=pagination, breadcrumbs=breadcrumbs)
+    news_list = News.query.order_by(News.created_at.desc()).all()
+    return render_template("news_list.html", news_list=news_list)
 
-# News detail
 @main_bp.route("/news/<int:news_id>")
 def news_detail(news_id):
-    item = News.query.get_or_404(news_id)
-    breadcrumbs = [("News", url_for("main.news_list")), (item.title, None)]
-    return render_template("news_detail.html", item=item, breadcrumbs=breadcrumbs)
+    news = News.query.get_or_404(news_id)
+    latest_news = News.query.filter(News.id != news_id).order_by(News.created_at.desc()).limit(3).all()
+    return render_template("news_detail.html", news=news, latest_news=latest_news)
 
 # Contacts - form
 @main_bp.route("/contacts", methods=["GET", "POST"])
