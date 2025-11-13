@@ -20,4 +20,9 @@ Thumbs.db
 
 # Logs
 *.log
-"/uploads/" 
+
+# Uploads (user content)
+uploads/
+
+# Render/Procfile etc.
+Procfile
