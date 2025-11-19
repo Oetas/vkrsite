@@ -98,6 +98,29 @@ def news_list():
     news_list = News.query.order_by(News.created_at.desc()).all()
     return render_template("news_list.html", news_list=news_list)
 
+# ---------------------------
+# ML materials + demo lesson
+# ---------------------------
+@main_bp.route("/ml-materials")
+def ml_materials():
+    # показываем доступные материалы (статические файлы)
+    datasets = [
+        {"name": "Iris Dataset (sample)", "path": url_for("static", filename="datasets/iris.csv")}
+    ]
+    notebooks = [
+        {"name": "Iris demo notebook", "path": url_for("static", filename="notebooks/iris_model.ipynb")}
+    ]
+    breadcrumbs = [("Материалы ML", url_for("main.ml_materials"))]
+    return render_template("ml_materials.html", datasets=datasets, notebooks=notebooks, breadcrumbs=breadcrumbs)
+
+
+@main_bp.route("/ml-intro")
+def ml_intro():
+    # простая статическая страница-урок
+    breadcrumbs = [("Уроки", url_for("main.lessons")), ("Введение в ML (демо)", None)]
+    return render_template("lesson_ml_intro.html", breadcrumbs=breadcrumbs)
+
+
 @main_bp.route("/news/<int:news_id>")
 def news_detail(news_id):
     news = News.query.get_or_404(news_id)
