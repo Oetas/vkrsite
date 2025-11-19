@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-4">Материалы по машинному обучению</h2>
+
+  <h4>Датасеты</h4>
+  <ul>
+    {% for d in datasets %}
+      <li>
+        {{ d.name }} — <a href="{{ d.path }}" download>Скачать</a>
+      </li>
+    {% endfor %}
+  </ul>
+
+  <h4 class="mt-4">Jupyter Notebooks</h4>
+  <ul>
+    {% for n in notebooks %}
+      <li>
+        {{ n.name }} — <a href="{{ n.path }}" download>Скачать .ipynb</a>
+        <!-- Если хочешь: ссылка для открытия в Colab (см. пояснение ниже) -->
+        <!-- <a href="https://colab.research.google.com/github/USERNAME/REPO/blob/main/static/notebooks/iris_model.ipynb" target="_blank">Open in Colab</a> -->
+      </li>
+    {% endfor %}
+  </ul>
+
+  <a class="btn btn-secondary mt-3" href="{{ url_for('main.index') }}">← Назад</a>
+</div>
+{% endblock %}

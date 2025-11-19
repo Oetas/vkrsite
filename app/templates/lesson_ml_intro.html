@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-4">Введение в машинное обучение — демо</h2>
+
+  <p>В этом уроке показан простой пример обучения классификатора на наборе Iris. Можно скачать датасет и ноутбук, открыть его в Jupyter/Colab и запустить.</p>
+
+  <a class="btn btn-outline-primary" href="{{ url_for('main.ml_materials') }}">Материалы по ML</a>
+  <a class="btn btn-secondary ms-2" href="{{ url_for('main.lessons') }}">← Назад к урокам</a>
+</div>
+{% endblock %}
