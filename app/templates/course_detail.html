@@ -6,8 +6,13 @@
   <h4>Уроки</h4>
   <ul>
     {% for lesson in course.lessons %}
-     <a href="{{ url_for('main.lesson_detail', lesson_id=lesson.id) }}">
+      <li>
+        <a href="{{ url_for('main.lesson_detail', lesson_id=lesson.id) }}">
+          {{ lesson.title }}
+        </a>
+      </li>
     {% endfor %}
   </ul>
 {% endblock %}
 
+<!-- комментарий -->
