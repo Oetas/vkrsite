@@ -6,8 +6,17 @@
 
   <table class="table table-striped">
     <thead>
-      <tr><th>#</th><th>Имя</th><th>Email</th><th>Тема</th><th>Дата</th><th></th></tr>
+      <tr>
+        <th>#</th>
+        <th>Имя</th>
+        <th>Email</th>
+        <th>Тема</th>
+        <th>Дата</th>
+        <th>Открыть</th>
+        <th>Статус</th>
+      </tr>
     </thead>
+
     <tbody>
       {% for c in pagination.items %}
       <tr>
@@ -16,30 +25,33 @@
         <td>{{ c.email }}</td>
         <td>{{ c.subject or "-" }}</td>
         <td>{{ c.created_at.strftime("%d.%m.%Y %H:%M") }}</td>
-        <td><a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin.contact_detail', contact_id=c.id) }}">Открыть</a></td>
-		<td>
-			{% if not c.is_read %}
-		<form method="post" action="{{ url_for('admin.mark_contact_read', contact_id=c.id) }}">
-		{% if csrf_token is defined %}
-		{{ csrf_token() }}
-		{% endif %}
-		<input type="hidden" name="next" value="{{ url_for('admin.contacts_list') }}">
-		{% if not c.is_read %}
-		<button class="btn btn-sm btn-outline-success">✓ Отметить как прочитанное</button>
-		{% else %}
-		<span class="badge bg-success">Прочитано</span>
-		{% endif %}
-		</form>
-			{% else %}
-				<span class="badge bg-success">Прочитано</span>
-			{% endif %}
 
-				<a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin.contact_detail', contact_id=c.id) }}">Открыть</a>
-		</td>
+        <!-- Единственная кнопка "Открыть" -->
+        <td>
+          <a class="btn btn-sm btn-outline-primary"
+             href="{{ url_for('admin.contact_detail', contact_id=c.id) }}">
+            Открыть
+          </a>
+        </td>
+
+        <!-- Блок прочитано / отметить -->
+        <td>
+          {% if not c.is_read %}
+          <form method="post" action="{{ url_for('admin.mark_contact_read', contact_id=c.id) }}" style="display:inline-block;">
+            {% if csrf_token is defined %}
+              {{ csrf_token() }}
+            {% endif %}
+            <input type="hidden" name="next" value="{{ url_for('admin.contacts_list') }}">
+            <button class="btn btn-sm btn-outline-success">✓ Отметить как прочитанное</button>
+          </form>
+          {% else %}
+            <span class="badge bg-success">Прочитано</span>
+          {% endif %}
+        </td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
 
-{% include "pagination.html" %}
+  {% include "pagination.html" %}
 {% endblock %}
