@@ -407,5 +407,18 @@ def download_report(report_id):
         mimetype=file.content_type or "application/octet-stream"
     )
 
+@admin_bp.route("/contacts/<int:contact_id>/reply", methods=["POST"])
+@login_required
+@admin_required
+def reply_contact(contact_id):
+    reply_text = request.form.get("reply_text", "").strip()
+
+    # Пока просто заглушка
+    flash("Функция отправки ответа будет реализована в будущей версии.", "info")
+
+    return redirect(url_for("admin.contact_detail", contact_id=contact_id))
+
+
+
 
 

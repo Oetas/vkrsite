@@ -23,6 +23,37 @@
     <span class="badge bg-success mb-3">Прочитано</span>
   {% endif %}
   </form>
+  <h4>Обратная связь</h4>
 
-  <a class="btn btn-secondary" href="{{ url_for('admin.contacts_list') }}">← Назад</a>
+<div class="d-flex gap-2 mb-3">
+    <button class="btn btn-primary"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#replyForm">
+        Ответить
+    </button>
+
+    <a class="btn btn-secondary"
+       href="{{ url_for('admin.contacts_list') }}">
+        ← Назад
+    </a>
+</div>
+
+<div class="collapse" id="replyForm">
+    <form method="post" action="{{ url_for('admin.reply_contact', contact_id=contact.id) }}">
+        {% if csrf_token is defined %}
+            {{ csrf_token() }}
+        {% endif %}
+
+        <div class="mb-3">
+            <label class="form-label">Текст ответа</label>
+            <textarea name="reply_text"
+                      class="form-control"
+                      rows="4"
+                      placeholder="Введите ответ пользователю..."></textarea>
+        </div>
+
+        <button class="btn btn-success">Отправить</button>
+    </form>
+</div>
 {% endblock %}
