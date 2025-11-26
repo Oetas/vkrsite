@@ -4,6 +4,7 @@ from wtforms import StringField, PasswordField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired, Email, Length, EqualTo
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms import SelectField, BooleanField
+from wtforms import SelectMultipleField
 
 class RegisterForm(FlaskForm):
     username = StringField("Имя пользователя", validators=[DataRequired(), Length(min=3, max=80)])
@@ -32,11 +33,11 @@ class FileUploadForm(FlaskForm):
     submit = SubmitField("Загрузить")
 
 class AdminUserForm(FlaskForm):
-    email = StringField("Email", validators=[DataRequired(), Email(), Length(max=255)])
-    username = StringField("Username", validators=[DataRequired(), Length(max=80)])
-    is_active = BooleanField("Active")
-    roles = SelectField("Role", coerce=int)  # будем заполнять choices динамически
-    submit = SubmitField("Сохранить")
+    email = StringField("Email", validators=[DataRequired(), Email()])
+    username = StringField("Имя пользователя", validators=[DataRequired(), Length(min=3, max=80)])
+    password = PasswordField("Пароль", validators=[DataRequired(), Length(min=6)])
+
+    roles = SelectMultipleField("Роли", coerce=int)
 
 class CourseForm(FlaskForm):
     title = StringField("Title", validators=[DataRequired(), Length(max=255)])

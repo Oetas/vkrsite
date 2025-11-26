@@ -3,7 +3,7 @@ from io import BytesIO
 from flask import Blueprint, render_template, request, url_for, redirect, flash, send_file
 from flask_login import login_required, current_user
 from sqlalchemy import func
-
+from .models import User, Role, Profile
 from app.extensions import db
 from app.utils import roles_required, make_breadcrumbs
 from app.decorators import admin_required
@@ -51,6 +51,58 @@ def contact_detail(contact_id):
     contact = Contact.query.get_or_404(contact_id)
     return render_template("admin/contact_detail.html", contact=contact)
 
+
+
+@admin_bp.route('/users/add', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def user_add():
+    form = AdminUserForm()
+
+    # Загружаем роли
+    form.roles.choices = [(r.id, r.name) for r in Role.query.order_by(Role.id).all()]
+
+    if form.validate_on_submit():
+        email = form.email.data.strip().lower()
+        username = form.username.data.strip().lower()
+        password = form.password.data.strip()
+
+        # Проверка уникальности
+        if User.query.filter_by(email=email).first():
+            flash("Пользователь с таким email уже существует", "danger")
+            return redirect(request.url)
+
+        if User.query.filter_by(username=username).first():
+            flash("Пользователь с таким username уже существует", "danger")
+            return redirect(request.url)
+
+        # Создаем пользователя
+        user = User(
+            email=email,
+            username=username,
+            is_active=True
+        )
+        user.set_password(password)
+
+        # Добавляем роли
+        selected_role_ids = form.roles.data
+        roles = Role.query.filter(Role.id.in_(selected_role_ids)).all()
+        user.roles = roles
+
+        db.session.add(user)
+        db.session.commit()
+
+        flash("Пользователь успешно создан", "success")
+        return redirect(url_for("admin.users_list"))
+
+    # Хлебные крошки
+    breadcrumbs = [
+        ("Админ-панель", url_for("admin.dashboard")),
+        ("Пользователи", url_for("admin.users_list")),
+        ("Добавить пользователя", None)
+    ]
+
+    return render_template("admin/user_add.html", form=form, breadcrumbs=breadcrumbs)
 
 @admin_bp.route("/contacts/<int:contact_id>/mark-read", methods=["POST"])
 @login_required

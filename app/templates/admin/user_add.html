@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Добавить пользователя</h1>
+
+<form method="POST" action="{{ url_for('admin.user_add') }}">
+    {{ form.hidden_tag() }}
+
+    <div class="mb-3">
+        {{ form.username.label(class="form-label") }}
+        {{ form.username(class="form-control") }}
+    </div>
+
+    <div class="mb-3">
+        {{ form.email.label(class="form-label") }}
+        {{ form.email(class="form-control") }}
+    </div>
+
+    <div class="mb-3">
+        {{ form.password.label(class="form-label") }}
+        {{ form.password(class="form-control") }}
+    </div>
+
+    <div class="mb-3">
+        {{ form.roles.label(class="form-label") }}
+        {{ form.roles(class="form-select", multiple=True) }}
+    </div>
+
+    <button type="submit" class="btn btn-primary">Создать пользователя</button>
+    <a href="{{ url_for('admin.users_list') }}" class="btn btn-secondary">Отмена</a>
+</form>
+
+{% endblock %}

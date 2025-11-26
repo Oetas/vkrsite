@@ -3,10 +3,19 @@
 {% block admin_content %}
 <h2>Пользователи</h2>
 
+<!-- Кнопка "Добавить пользователя" -->
+<div class="mb-3">
+  <a class="btn btn-success" href="{{ url_for('admin.user_add') }}">
+    Добавить пользователя
+  </a>
+</div>
+
+<!-- Поиск -->
 <form class="mb-3" method="get">
   <input type="text" name="q" value="{{ q }}" placeholder="Поиск" class="form-control" />
 </form>
 
+<!-- Таблица пользователей -->
 <table class="table">
   <thead>
     <tr>
@@ -24,10 +33,16 @@
       <td>{{ u.id }}</td>
       <td>{{ u.username }}</td>
       <td>{{ u.email }}</td>
-      <td>{% for r in u.roles %}{{ r.name }}{% if not loop.last %}, {% endif %}{% endfor %}</td>
+      <td>
+        {% for r in u.roles %}
+          {{ r.name }}{% if not loop.last %}, {% endif %}
+        {% endfor %}
+      </td>
       <td>{{ "✔" if u.is_active else "✖" }}</td>
       <td>
-        <a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin.user_edit', user_id=u.id) }}">Edit</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin.user_edit', user_id=u.id) }}">
+          Редактировать
+        </a>
       </td>
     </tr>
     {% endfor %}
