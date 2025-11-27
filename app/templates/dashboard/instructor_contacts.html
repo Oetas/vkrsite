@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Обратная связь от студентов</h1>
+
+<table class="table">
+  <thead><tr><th>#</th><th>Имя</th><th>Email</th><th>Тема</th><th>Дата</th><th></th></tr></thead>
+  <tbody>
+  {% for c in pagination.items %}
+    <tr>
+      <td>{{ c.id }}</td>
+      <td>{{ c.name }}</td>
+      <td>{{ c.email }}</td>
+      <td>{{ c.subject or '-' }}</td>
+      <td>{{ c.created_at.strftime("%d.%m.%Y %H:%M") }}</td>
+      <td><a class="btn btn-sm btn-outline-primary" href="{{ url_for('dashboard.instructor_contact_detail', contact_id=c.id) }}">Открыть</a></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+{% include "pagination.html" with context %}
+{% endblock %}

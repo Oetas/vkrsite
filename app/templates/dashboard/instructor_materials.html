@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Методические материалы</h1>
+{% if groups %}
+  {% for g in groups %}
+    <h4 class="mt-4">{{ g['course_slug'] }}</h4>
+    <ul>
+      {% for item in g['items'] %}
+        <li><a href="{{ item.url }}" target="_blank">{{ item.name }}</a></li>
+      {% endfor %}
+    </ul>
+  {% endfor %}
+{% else %}
+  <div class="alert alert-info">Пока нет материалов. Положите файлы в <code>static/materials/&lt;course_slug&gt;/</code></div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Расписание</h1>
+
+{% if schedule %}
+  <table class="table">
+    <thead><tr><th>Дата</th><th>Время</th><th>Событие</th><th>Курс</th></tr></thead>
+    <tbody>
+      {% for s in schedule %}
+        <tr>
+          <td>{{ s.date }}</td>
+          <td>{{ s.time or '-' }}</td>
+          <td>{{ s.title }}</td>
+          <td>{{ s.course_slug or '-' }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <div class="alert alert-info">Расписание не задано. Положите JSON в <code>static/schedules/{{ current_user.username }}.json</code></div>
+{% endif %}
+
+{% endblock %}
