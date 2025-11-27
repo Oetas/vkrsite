@@ -294,6 +294,22 @@ def user_edit(user_id):
     )
     return render_template("admin/user_edit.html", user=user, form=form, breadcrumbs=breadcrumbs)
 
+# ---------- User delete ----------
+@admin_bp.route("/users/<int:user_id>/delete", methods=["POST"])
+@login_required
+@roles_required("admin")
+def user_delete(user_id):
+    user = User.query.get_or_404(user_id)
+
+    # защита: нельзя удалить самого себя
+    if user.id == current_user.id:
+        flash("Нельзя удалить самого себя!", "danger")
+        return redirect(url_for("admin.users_list"))
+
+    db.session.delete(user)
+    db.session.commit()
+    flash(f"Пользователь {user.username} успешно удален", "success")
+    return redirect(url_for("admin.users_list"))
 
 
 
