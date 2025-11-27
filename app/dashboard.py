@@ -7,6 +7,7 @@ from datetime import datetime
 from flask import Blueprint, render_template, request, url_for, redirect, flash, send_file, current_app
 from flask_login import login_required, current_user
 from sqlalchemy import func
+from werkzeug.utils import secure_filename
 
 from app.utils import roles_required, make_breadcrumbs
 from app.extensions import db
@@ -259,3 +260,37 @@ def instructor_schedule():
             except Exception:
                 item["date_obj"] = None
     return render_template("dashboard/instructor_schedule.html", schedule=schedule, breadcrumbs=breadcrumbs)
+
+@dashboard_bp.route("/instructor/reports/upload", methods=["GET", "POST"])
+@login_required
+@roles_required("teacher")
+def upload_report():
+    if request.method == "POST":
+        file = request.files.get("file")
+        if not file:
+            flash("Файл не выбран!", "danger")
+            return redirect(request.url)
+
+        # Сохраняем файл
+        filename = secure_filename(file.filename)
+        filepath = os.path.join("uploads/reports", filename)
+        os.makedirs("uploads/reports", exist_ok=True)
+        file.save(filepath)
+
+        # Записываем в БД
+        report = Report(
+            type="daily",
+            status="загружен",
+            file_id=filename,
+        )
+        db.session.add(report)
+        db.session.commit()
+
+        flash("Отчёт успешно загружен!", "success")
+        return redirect(url_for("dashboard.instructor_reports"))
+
+    breadcrumbs = [
+        ("Личный кабинет", url_for("dashboard.instructor_dashboard")),
+        ("Загрузить отчёт", None),
+    ]
+    return render_template("dashboard/upload_report.html", breadcrumbs=breadcrumbs)

@@ -1,9 +1,13 @@
 {% extends "base.html" %}
 
-{% block dashboard_content %}
+{% block content %}
 <div class="container mt-4">
   <h2 class="mb-3">Мои отчёты</h2>
+  
 
+ <a class="btn btn-success mb-3" href="{{ url_for('dashboard.upload_report') }}">
+  Загрузить отчёт
+ </a>
   {% if pagination.items %}
     <ul class="list-group">
       {% for report in pagination.items %}
@@ -28,7 +32,7 @@
 
     {% include "pagination.html" %}
   {% else %}
-    <p>Пока нет отчётов.</p>
+    <p class="text-muted">Пока нет отчётов.</p>
   {% endif %}
 </div>
 {% endblock %}

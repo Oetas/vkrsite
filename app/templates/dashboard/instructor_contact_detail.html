@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Сообщение #{{ contact.id }}</h1>
+
+<dl class="row">
+  <dt class="col-sm-2">Имя</dt><dd class="col-sm-10">{{ contact.name }}</dd>
+  <dt class="col-sm-2">Email</dt><dd class="col-sm-10">{{ contact.email }}</dd>
+  <dt class="col-sm-2">Тема</dt><dd class="col-sm-10">{{ contact.subject or '-' }}</dd>
+  <dt class="col-sm-2">Дата</dt><dd class="col-sm-10">{{ contact.created_at.strftime("%d.%m.%Y %H:%M") }}</dd>
+</dl>
+
+<h4>Сообщение</h4>
+<div class="border p-3 mb-3">{{ contact.message | nl2br }}</div>
+
+<a class="btn btn-secondary" href="{{ url_for('dashboard.instructor_contacts') }}">← Назад</a>
+{% endblock %}

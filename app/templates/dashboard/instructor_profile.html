@@ -23,4 +23,11 @@
   <button class="btn btn-primary">Сохранить</button>
   <a class="btn btn-secondary" href="{{ url_for('dashboard.instructor_dashboard') }}">Отмена</a>
 </form>
+
+{% if get_flashed_messages() %}
+  <a class="btn btn-outline-secondary mt-3" href="{{ url_for('dashboard.instructor_dashboard') }}">
+      Вернуться в кабинет
+  </a>
+{% endif %}
+
 {% endblock %}
