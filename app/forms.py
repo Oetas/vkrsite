@@ -1,7 +1,7 @@
 # app/forms.py
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField
-from wtforms.validators import DataRequired, Email, Length, EqualTo
+from wtforms.validators import DataRequired, Email, Length, EqualTo, Optional
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms import SelectField, BooleanField
 from wtforms import SelectMultipleField
@@ -35,9 +35,10 @@ class FileUploadForm(FlaskForm):
 class AdminUserForm(FlaskForm):
     email = StringField("Email", validators=[DataRequired(), Email()])
     username = StringField("Имя пользователя", validators=[DataRequired(), Length(min=3, max=80)])
-    password = PasswordField("Пароль", validators=[DataRequired(), Length(min=6)])
-
+    password = PasswordField("Пароль", validators=[Optional(), Length(min=6)])  # <-- Optional вместо DataRequired
     roles = SelectMultipleField("Роли", coerce=int)
+    is_active = BooleanField("Активен")
+    submit = SubmitField("Сохранить")
 
 class CourseForm(FlaskForm):
     title = StringField("Title", validators=[DataRequired(), Length(max=255)])

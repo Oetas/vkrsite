@@ -264,20 +264,27 @@ def user_edit(user_id):
     roles = Role.query.order_by(Role.name).all()
     form.roles.choices = [(r.id, r.name) for r in roles]
 
+    # Предзаполнение формы ролями пользователя при GET
     if request.method == "GET":
         if user.roles:
-            # preselect first role
-            form.roles.data = user.roles[0].id
+            form.roles.data = [r.id for r in user.roles]  # все роли пользователя
 
+    # Обработка POST-запроса
     if form.validate_on_submit():
         user.email = form.email.data.strip()
         user.username = form.username.data.strip()
         user.is_active = bool(form.is_active.data)
-        selected_role = Role.query.get(form.roles.data)
-        if selected_role:
-            user.roles = [selected_role]
+
+        # <-- Новое: обновляем пароль только если пользователь ввёл что-то
+        if form.password.data:
+            user.set_password(form.password.data.strip())
+
+        # Сохраняем роли
+        selected_roles = Role.query.filter(Role.id.in_(form.roles.data)).all()
+        user.roles = selected_roles
+
         db.session.commit()
-        flash("User saved", "success")
+        flash("Пользователь успешно сохранен", "success")
         return redirect(url_for("admin.users_list"))
 
     breadcrumbs = make_breadcrumbs(
@@ -286,6 +293,8 @@ def user_edit(user_id):
         ("Редактирование", None, None)
     )
     return render_template("admin/user_edit.html", user=user, form=form, breadcrumbs=breadcrumbs)
+
+
 
 
 # ---------- Courses ----------
