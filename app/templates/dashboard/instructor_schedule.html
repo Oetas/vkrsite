@@ -2,6 +2,10 @@
 {% block content %}
 <h1>Расписание</h1>
 
+<a class="btn btn-secondary mb-3" href="{{ url_for('dashboard.instructor_dashboard') }}">
+    Отмена
+</a>
+
 {% if schedule %}
   <table class="table">
     <thead><tr><th>Дата</th><th>Время</th><th>Событие</th><th>Курс</th></tr></thead>
@@ -17,7 +21,10 @@
     </tbody>
   </table>
 {% else %}
-  <div class="alert alert-info">Расписание не задано. Положите JSON в <code>static/schedules/{{ current_user.username }}.json</code></div>
+  <div class="alert alert-info">
+    Расписание не задано. Положите JSON в
+    <code>static/schedules/{{ current_user.username }}.json</code>
+  </div>
 {% endif %}
 
 {% endblock %}

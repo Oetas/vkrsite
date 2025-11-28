@@ -13,4 +13,5 @@
 {% else %}
   <div class="alert alert-info">Пока нет материалов. Положите файлы в <code>static/materials/&lt;course_slug&gt;/</code></div>
 {% endif %}
+<a class="btn btn-secondary" href="{{ url_for('dashboard.instructor_dashboard') }}">Отмена</a>
 {% endblock %}

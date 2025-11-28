@@ -265,32 +265,4 @@ def instructor_schedule():
 @login_required
 @roles_required("teacher")
 def upload_report():
-    if request.method == "POST":
-        file = request.files.get("file")
-        if not file:
-            flash("Файл не выбран!", "danger")
-            return redirect(request.url)
-
-        # Сохраняем файл
-        filename = secure_filename(file.filename)
-        filepath = os.path.join("uploads/reports", filename)
-        os.makedirs("uploads/reports", exist_ok=True)
-        file.save(filepath)
-
-        # Записываем в БД
-        report = Report(
-            type="daily",
-            status="загружен",
-            file_id=filename,
-        )
-        db.session.add(report)
-        db.session.commit()
-
-        flash("Отчёт успешно загружен!", "success")
-        return redirect(url_for("dashboard.instructor_reports"))
-
-    breadcrumbs = [
-        ("Личный кабинет", url_for("dashboard.instructor_dashboard")),
-        ("Загрузить отчёт", None),
-    ]
-    return render_template("dashboard/upload_report.html", breadcrumbs=breadcrumbs)
+    return "Функция скачивания пока не реализована"
