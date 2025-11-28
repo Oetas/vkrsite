@@ -10,7 +10,7 @@
       <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('dashboard.instructor_course_students', course_id=c.id) }}">Студенты</a>
     </div>
   </div>
-  <a class="btn btn-secondary" href="{{ url_for('dashboard.instructor_dashboard') }}">Отмена</a>
 {% endfor %}
 {% include "pagination.html" %}
+<a class="btn btn-secondary" href="{{ url_for('dashboard.instructor_dashboard') }}">Отмена</a>
 {% endblock %}
