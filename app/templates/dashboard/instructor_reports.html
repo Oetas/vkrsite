@@ -33,7 +33,7 @@
     {% include "pagination.html" %}
   {% else %}
     <p class="text-muted">Пока нет отчётов.</p>
+	<a class="btn btn-secondary" href="{{ url_for('dashboard.instructor_dashboard') }}">Отмена</a>
   {% endif %}
 </div>
-<a class="btn btn-secondary" href="{{ url_for('dashboard.instructor_dashboard') }}">Отмена</a>
 {% endblock %}

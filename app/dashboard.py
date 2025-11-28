@@ -266,3 +266,9 @@ def instructor_schedule():
 @roles_required("teacher")
 def upload_report():
     return "Функция скачивания пока не реализована"
+
+@dashboard_bp.route("/instructor/reports/download/<int:report_id>")
+@login_required
+@roles_required("teacher")
+def download_report(report_id):
+    return f"Скачивание отчёта #{report_id} пока не реализовано"
