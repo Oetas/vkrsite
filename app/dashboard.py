@@ -267,8 +267,37 @@ def instructor_schedule():
 def upload_report():
     return "Функция скачивания пока не реализована"
 
+from flask import send_from_directory, abort, current_app
+import os
+
 @dashboard_bp.route("/instructor/reports/download/<int:report_id>")
 @login_required
 @roles_required("teacher")
 def download_report(report_id):
-    return f"Скачивание отчёта #{report_id} пока не реализовано"
+    report = Reports.query.get(report_id)
+
+    if not report:
+        abort(404, "Отчёт не найден")
+
+    if not report.file_id:
+        abort(404, "У отчёта нет файла")
+
+    # путь к хранилищу
+    folder = current_app.config["UPLOAD_FOLDER"]
+
+    # имя файла на диске
+    filename = report.file_id
+
+    file_path = os.path.join(folder, filename)
+
+    if not os.path.exists(file_path):
+        abort(404, "Файл отсутствует на сервере")
+
+    # отправляем файл пользователю
+    return send_from_directory(
+        folder,
+        filename,
+        as_attachment=True,
+        download_name=filename
+    )
+
