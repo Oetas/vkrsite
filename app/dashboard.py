@@ -274,30 +274,57 @@ import os
 @login_required
 @roles_required("teacher")
 def download_report(report_id):
-    report = Reports.query.get(report_id)
-
+    # 1) получаем запись отчёта
+    report = Report.query.get(report_id)
     if not report:
         abort(404, "Отчёт не найден")
 
-    if not report.file_id:
-        abort(404, "У отчёта нет файла")
+    # 2) если в отчёте хранится ссылка на запись в таблице files (целое число)
+    folder = current_app.config.get("UPLOAD_FOLDER")
+    file_to_send = None
+    download_name = None
 
-    # путь к хранилищу
-    folder = current_app.config["UPLOAD_FOLDER"]
+    # если file_id — число или строка-число, пробуем найти в таблице File
+    try:
+        # иногда в базе file_id хранится строка (например '1.png'), поэтому сначала пробуем привести к int
+        file_id_int = int(report.file_id) if report.file_id is not None else None
+    except (ValueError, TypeError):
+        file_id_int = None
 
-    # имя файла на диске
-    filename = report.file_id
+    if file_id_int:
+        file_rec = File.query.get(file_id_int)
+        if file_rec:
+            # используем путь из File.path
+            if folder and os.path.isabs(file_rec.path):
+                # если в path уже абсолютный путь
+                candidate = file_rec.path
+            else:
+                candidate = os.path.join(folder or current_app.static_folder, file_rec.path)
+            if os.path.exists(candidate):
+                file_to_send = candidate
+                download_name = file_rec.original_name or os.path.basename(candidate)
 
-    file_path = os.path.join(folder, filename)
+    # 3) если не нашли через таблицу File — возможно в report.file_id лежит само имя файла/путь
+    if not file_to_send and report.file_id:
+        # считаем, что report.file_id — это имя файла в UPLOAD_FOLDER
+        folder = folder or current_app.config.get("UPLOADS_FOLDER") or current_app.static_folder
+        candidate = os.path.join(folder, str(report.file_id))
+        if os.path.exists(candidate):
+            file_to_send = candidate
+            download_name = os.path.basename(candidate)
 
-    if not os.path.exists(file_path):
-        abort(404, "Файл отсутствует на сервере")
+    if not file_to_send:
+        # дополнительно логируем, чтобы отладить на проде (можно убрать)
+        current_app.logger.error(f"Download failed: report_id={report_id}, file_id={report.file_id}, UPLOAD_FOLDER={folder}")
+        abort(404, "Файл отчёта не найден на сервере")
 
-    # отправляем файл пользователю
-    return send_from_directory(
-        folder,
-        filename,
-        as_attachment=True,
-        download_name=filename
-    )
+    # 4) используем send_from_directory безопасно
+    folder_dir = os.path.dirname(file_to_send)
+    filename = os.path.basename(file_to_send)
+    try:
+        # modern Flask
+        return send_from_directory(folder_dir, filename, as_attachment=True, download_name=download_name)
+    except TypeError:
+        # fallback для старых Flask
+        return send_from_directory(folder_dir, filename, as_attachment=True, attachment_filename=download_name)
 
