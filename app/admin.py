@@ -347,7 +347,7 @@ def course_create():
         )
         db.session.add(course)
         db.session.commit()
-        flash("Course created", "success")
+        flash("Курс создан", "success")
         return redirect(url_for("admin.courses_list"))
     return render_template("admin/course_edit.html", form=form)
 
@@ -365,7 +365,7 @@ def course_edit(course_id):
         course.level = form.level.data
         course.is_published = bool(form.is_published.data)
         db.session.commit()
-        flash("Course saved", "success")
+        flash("Курс сохранен", "success")
         return redirect(url_for("admin.courses_list"))
 
     breadcrumbs = make_breadcrumbs(("Панель", "admin.dashboard", None), ("Курсы", "admin.courses_list", None), ("Редактирование", None, None))
@@ -379,7 +379,7 @@ def course_delete(course_id):
     course = Course.query.get_or_404(course_id)
     db.session.delete(course)
     db.session.commit()
-    flash("Course deleted", "success")
+    flash("Курс удален", "success")
     return redirect(url_for("admin.courses_list"))
 
 
