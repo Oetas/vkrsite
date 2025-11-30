@@ -41,10 +41,10 @@ class AdminUserForm(FlaskForm):
     submit = SubmitField("Сохранить")
 
 class CourseForm(FlaskForm):
-    title = StringField("Title", validators=[DataRequired(), Length(max=255)])
-    slug = StringField("Slug", validators=[DataRequired(), Length(max=255)])
-    description = TextAreaField("Description")
-    level = SelectField("Level", choices=[("beginner","beginner"),("intermediate","intermediate"),("advanced","advanced")])
-    is_published = BooleanField("Published")
-    submit = SubmitField("Save")
+    title = StringField("Заголовок", validators=[DataRequired(), Length(max=255)])
+    slug = StringField("URL-имя", validators=[DataRequired(), Length(max=255)])
+    description = TextAreaField("Описание")
+    level = SelectField("Уровень", choices=[("beginner","beginner"),("intermediate","intermediate"),("advanced","advanced")])
+    is_published = BooleanField("Опубликован")
+    submit = SubmitField("Сохранить")
 
